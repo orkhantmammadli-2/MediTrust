@@ -13,6 +13,12 @@ public class FallbackController {
     @RequestMapping("/fallback/patient")
     public Mono<ResponseEntity<String>> patientFallback() {
         return Mono.just(ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body("Patient Service is currently unavailable. Please try again later."));
+                .body("Patient Service (8081) is currently unavailable. Please try again later."));
+    }
+
+    @RequestMapping("/fallback/appointment")
+    public Mono<ResponseEntity<String>> appointmentFallback() {
+        return Mono.just(ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body("Appointment Service (8082) is currently unavailable. Please try again later."));
     }
 }

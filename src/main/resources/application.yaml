@@ -22,10 +22,31 @@ spring:
                   args:
                     name: patientCircuitBreaker
                     fallbackUri: forward:/fallback/patient
+            - id: appointment-route
+              uri: http://localhost:8082
+              predicates:
+                - Path=/api/appointment/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 3
+                    redis-rate-limiter.burstCapacity: 3
+                    key-resolver: "#{@ipKeyResolver}"
+                - name: CircuitBreaker
+                  args:
+                    name: appointmentCircuitBreaker
+                    fallbackUri: forward:/fallback/appointment
 resilience4j:
   circuitbreaker:
     instances:
       patientCircuitBreaker:
+        slidingWindowSize: 3
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 2
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+      appointmentCircuitBreaker:
         slidingWindowSize: 3
         minimumNumberOfCalls: 3
         failureRateThreshold: 50
