@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/patient")
 @Slf4j
@@ -29,9 +31,36 @@ public class PatientController {
         return new ResponseEntity<>(patientResponse,HttpStatus.ACCEPTED);
     }
     @DeleteMapping("/delete/{id}")
+    @Operation(summary = "Delete a patient")
     public ResponseEntity<Void> deletePatient(@PathVariable Long id) {
         patientServiceImple.delete(id);
         log.info("Patient deleted : {}", id);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
+
+    @GetMapping("/all")
+    @Operation(summary = "Show all patients")
+    public ResponseEntity<List<PatientResponse>> getAllPatients() {
+        List<PatientResponse> patientResponses =  patientServiceImple.getAll();
+        log.info("Patient list retrieved : {}", patientResponses);
+        return new ResponseEntity<>(patientResponses, HttpStatus.OK);
+    }
+
+    @GetMapping("/getById/{id}")
+    @Operation(summary = "Get patient by Id")
+    public ResponseEntity<PatientResponse> getPatientById(@PathVariable Long id) {
+        PatientResponse patientResponse = patientServiceImple.getById(id);
+        log.info("Patient retrieved : {}", patientResponse);
+        return new ResponseEntity<>(patientResponse, HttpStatus.OK);
+    }
+
+    @PutMapping("/update/{id}")
+    @Operation(summary = "Update patient by Id")
+    public ResponseEntity<PatientResponse> updatePatient(@PathVariable Long id,
+                                                         @Valid @RequestBody PatientRequest patientRequest) {
+        PatientResponse patientResponse = patientServiceImple.update(id, patientRequest);
+        log.info("Patient updated : {}", patientResponse);
+        return new ResponseEntity<>(patientResponse, HttpStatus.ACCEPTED);
+    }
+
 }
