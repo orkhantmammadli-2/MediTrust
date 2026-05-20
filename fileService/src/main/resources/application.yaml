@@ -1,3 +1,20 @@
+server:
+  port: 8088
 spring:
   application:
-    name: fileService
+    name: file-service
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+aws:
+  s3:
+    bucket-name: medi-trust-ai-files-697374140390-eu-north-1-an
+  region: eu-north-1
+  credentials:
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
+logging:
+  level:
+    root: INFO
+    com.ltc.fileservice: DEBUG

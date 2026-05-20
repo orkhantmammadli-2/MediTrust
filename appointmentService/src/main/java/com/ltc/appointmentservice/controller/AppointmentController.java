@@ -1,18 +1,20 @@
 package com.ltc.appointmentservice.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ltc.appointmentservice.dto.AppointmentRequest;
 import com.ltc.appointmentservice.dto.AppointmentResponse;
-import com.ltc.appointmentservice.dto.PatientResponse;
 import com.ltc.appointmentservice.service.AppointmentServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
@@ -24,11 +26,15 @@ public class AppointmentController {
         this.appointmentServiceImpl = appointmentServiceImpl;
     }
     @Operation(summary = "Add a new appointment")
-    @PostMapping("/add")
-    public ResponseEntity<AppointmentResponse> addAppointment(@Valid @RequestBody AppointmentRequest request){
-        AppointmentResponse appointmentResponse = appointmentServiceImpl.addAppointment(request);
-        return new ResponseEntity<>(appointmentResponse, HttpStatus.CREATED);
-    }
+    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<AppointmentResponse>
+    addAppointment( @RequestPart("data") String requestJson,
+                    @RequestPart("file") MultipartFile file)
+            throws JsonProcessingException { ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule( new JavaTimeModule());
+        AppointmentRequest request = mapper.readValue( requestJson, AppointmentRequest.class);
+        AppointmentResponse response = appointmentServiceImpl.addAppointment( request, file);
+        return new ResponseEntity<>( response, HttpStatus.CREATED);}
 
     @Operation(summary = "Show all appointments")
     @GetMapping("/all")

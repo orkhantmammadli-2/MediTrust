@@ -21,4 +21,9 @@ public class FallbackController {
         return Mono.just(ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body("Appointment Service (8082) is currently unavailable. Please try again later."));
     }
+    @RequestMapping("/fallback/file")
+    public Mono<ResponseEntity<String>> fileFallback() {
+        return Mono.just(ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body("File Service (8088) is currently unavailable. Please try again later."));
+    }
 }

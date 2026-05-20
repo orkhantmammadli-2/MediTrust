@@ -3,6 +3,9 @@ plugins {
     id 'org.springframework.boot' version '3.5.14'
     id 'io.spring.dependency-management' version '1.1.7'
 }
+ext {
+    springCloudVersion = "2025.0.2"
+}
 
 group = 'com.ltc'
 version = '0.0.1-SNAPSHOT'
@@ -20,8 +23,20 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'software.amazon.awssdk:s3:2.31.65'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+    }
 }
 
 tasks.named('test') {
