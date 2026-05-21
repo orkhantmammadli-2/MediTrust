@@ -14,4 +14,5 @@ public interface AppointmentService {
     List<AppointmentResponse> getByPatientId (Long patientId);
     AppointmentResponse updateAppointment (Long id, AppointmentRequest request);
     void deleteById (Long id);
+    public void verifyAppointment(Long id);
 }

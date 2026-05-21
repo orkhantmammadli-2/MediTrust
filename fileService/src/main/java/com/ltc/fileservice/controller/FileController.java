@@ -1,6 +1,6 @@
 package com.ltc.fileservice.controller;
 
-import com.ltc.fileservice.FileServiceS.FileServiceImpl;
+import com.ltc.fileservice.fileServiceS.FileServiceImpl;
 import com.ltc.fileservice.dto.FileUploadResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -42,13 +42,8 @@ public class AppointmentServiceImpl implements AppointmentService{
     @Override
     public AppointmentResponse addAppointment(AppointmentRequest request, MultipartFile file) {
         patientClient.getPatientById(request.getPatientId());
-        MultiValueMap<String, Object> body =
-                new LinkedMultiValueMap<>();
-
-        try {
-            body.add(
-                    "file",
-                    new MultipartInputStreamFileResource(
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        try {body.add("file", new MultipartInputStreamFileResource(
                             file.getInputStream(),
                             file.getOriginalFilename()
                     )
@@ -65,11 +60,7 @@ public class AppointmentServiceImpl implements AppointmentService{
         HttpEntity<MultiValueMap<String, Object>>
                 requestEntity =
                 new HttpEntity<>(body, headers);
-
-        // Call file-service
-        ResponseEntity<FileUploadResponse>
-                uploadResponse =
-                restTemplate.postForEntity(
+        ResponseEntity<FileUploadResponse> uploadResponse = restTemplate.postForEntity(
                         "http://localhost:8088/api/v1/files/upload",
                         requestEntity,
                         FileUploadResponse.class
@@ -102,8 +93,7 @@ public class AppointmentServiceImpl implements AppointmentService{
         return appointmentRepository.findByPatientId(patientId)
                 .stream()
                 .map(appointmentMapper::toResponse)
-                .toList();
-    }
+                .toList();}
 
     @Override
     public AppointmentResponse updateAppointment(Long id, AppointmentRequest request) {
@@ -119,5 +109,12 @@ public class AppointmentServiceImpl implements AppointmentService{
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(()-> new AppointmentNotFound("Appointment not found with id " + id));
         appointmentRepository.delete(appointment);
+    }
+    @Override
+    public void verifyAppointment(Long id) {
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(() ->
+                new AppointmentNotFound( "Appointment not found with id " + id));
+        appointment.setAdmissionVerified(true);
+        appointmentRepository.save(appointment);
     }
 }

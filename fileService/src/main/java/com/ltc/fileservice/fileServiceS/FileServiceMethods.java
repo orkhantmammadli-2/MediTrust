@@ -1,4 +1,4 @@
-package com.ltc.fileservice.FileServiceS;
+package com.ltc.fileservice.fileServiceS;
 
 import com.ltc.fileservice.dto.FileUploadResponse;
 import org.springframework.web.multipart.MultipartFile;

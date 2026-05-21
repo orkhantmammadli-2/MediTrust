@@ -77,4 +77,9 @@ public class AppointmentController {
                 )
         );
     }
+    @PatchMapping("/{id}/verify")
+    public ResponseEntity<String> verifyAppointment( @PathVariable Long id) {
+        appointmentServiceImpl.verifyAppointment(id);
+        return ResponseEntity.ok("Appointment verified successfully");
+    }
 }
