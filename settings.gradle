@@ -1,1 +1,5 @@
 rootProject.name = 'MediTrust'
+
+include 'patientService'
+include 'appointmentService'
+include 'fileService'

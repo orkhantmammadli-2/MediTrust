@@ -20,6 +20,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/appointments")
 @Slf4j
+@CrossOrigin(origins = "*")
+
 public class AppointmentController {
     private final AppointmentServiceImpl appointmentServiceImpl;
     public AppointmentController(AppointmentServiceImpl appointmentServiceImpl) {
@@ -29,7 +31,7 @@ public class AppointmentController {
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AppointmentResponse>
     addAppointment( @RequestPart("data") String requestJson,
-                    @RequestPart("file") MultipartFile file)
+                    @RequestPart(value = "file", required = false) MultipartFile file)
             throws JsonProcessingException { ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule( new JavaTimeModule());
         AppointmentRequest request = mapper.readValue( requestJson, AppointmentRequest.class);

@@ -4,6 +4,7 @@ import com.ltc.appointmentservice.configuration.MultipartInputStreamFileResource
 import com.ltc.appointmentservice.dto.AppointmentRequest;
 import com.ltc.appointmentservice.dto.AppointmentResponse;
 import com.ltc.appointmentservice.dto.FileUploadResponse;
+import com.ltc.appointmentservice.dto.NotificationMessage;
 import com.ltc.appointmentservice.entity.Appointment;
 import com.ltc.appointmentservice.exception.AppointmentNotFound;
 import com.ltc.appointmentservice.feign.PatientClient;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -31,47 +33,36 @@ public class AppointmentServiceImpl implements AppointmentService{
     private final AppointmentMapper appointmentMapper;
     private final PatientClient patientClient;
     private final RestTemplate restTemplate;
-    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper, PatientClient patientClient, RestTemplate restTemplate) {
+    private final SimpMessagingTemplate messagingTemplate;
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper, PatientClient patientClient, RestTemplate restTemplate, SimpMessagingTemplate messagingTemplate) {
         this.appointmentRepository = appointmentRepository;
         this.appointmentMapper = appointmentMapper;
         this.patientClient = patientClient;
         this.restTemplate = restTemplate;
+        this.messagingTemplate = messagingTemplate;
     }
 
 
     @Override
     public AppointmentResponse addAppointment(AppointmentRequest request, MultipartFile file) {
         patientClient.getPatientById(request.getPatientId());
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        try {body.add("file", new MultipartInputStreamFileResource(
-                            file.getInputStream(),
-                            file.getOriginalFilename()
-                    )
-            );
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(
-                MediaType.MULTIPART_FORM_DATA
-        );
-
-        HttpEntity<MultiValueMap<String, Object>>
-                requestEntity =
-                new HttpEntity<>(body, headers);
-        ResponseEntity<FileUploadResponse> uploadResponse = restTemplate.postForEntity(
-                        "http://localhost:8088/api/v1/files/upload",
-                        requestEntity,
-                        FileUploadResponse.class
-                );
         Appointment appointment = appointmentMapper.toEntity(request);
-        appointment.setAdmissionDocumentPath(
-                uploadResponse.getBody().getFileUrl()
-        );
+        if (file != null && !file.isEmpty()) { MultiValueMap<String, Object> body =
+                    new LinkedMultiValueMap<>();
+            try { body.add( "file", new MultipartInputStreamFileResource(
+                                file.getInputStream(),
+                                file.getOriginalFilename()));
+            } catch (IOException e) {throw new RuntimeException(e);}
+            HttpHeaders headers = new HttpHeaders();headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+            ResponseEntity<FileUploadResponse> uploadResponse = restTemplate.postForEntity(
+                            "http://localhost:8088/api/v1/files/upload", requestEntity, FileUploadResponse.class);
+            appointment.setAdmissionDocumentPath(uploadResponse.getBody().getFileUrl());}
         appointment.setAdmissionVerified(false);
         Appointment savedAppointment = appointmentRepository.save(appointment);
-        return appointmentMapper.toResponse(savedAppointment);
+        AppointmentResponse response = appointmentMapper.toResponse(savedAppointment);
+        messagingTemplate.convertAndSend("/topic/appointments", response);
+        return response;
     }
 
     @Override
@@ -113,8 +104,15 @@ public class AppointmentServiceImpl implements AppointmentService{
     @Override
     public void verifyAppointment(Long id) {
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(() ->
-                new AppointmentNotFound( "Appointment not found with id " + id));
+                                new AppointmentNotFound("Not found")
+                        );
         appointment.setAdmissionVerified(true);
         appointmentRepository.save(appointment);
+        messagingTemplate.convertAndSend(
+                "/topic/appointments",
+                new NotificationMessage(
+                        "APPOINTMENT_VERIFIED"
+                )
+        );
     }
 }

@@ -1,0 +1,709 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediTrust Admin Dashboard</title>
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:"Segoe UI",sans-serif;
+            background:
+                    radial-gradient(circle at top left,#172554,transparent 30%),
+                    radial-gradient(circle at top right,#1e1b4b,transparent 30%),
+                    #020617;
+            color:white;
+            min-height:100vh;
+        }
+
+        /* HEADER */
+
+        .header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:20px 40px;
+            border-bottom:1px solid rgba(255,255,255,0.06);
+            background:rgba(2,6,23,0.75);
+            backdrop-filter:blur(10px);
+            position:sticky;
+            top:0;
+            z-index:100;
+        }
+
+        .logo{
+            font-size:24px;
+            font-weight:700;
+            letter-spacing:1px;
+        }
+
+        .connection{
+            padding:8px 14px;
+            border-radius:999px;
+            background:rgba(34,197,94,0.15);
+            color:#22c55e;
+            font-size:13px;
+            border:1px solid rgba(34,197,94,0.2);
+        }
+
+        /* LAYOUT */
+
+        .layout{
+            display:grid;
+            grid-template-columns:350px 1fr;
+            gap:20px;
+            padding:20px;
+        }
+
+        .sidebar{
+            background:rgba(255,255,255,0.04);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:20px;
+            padding:20px;
+            backdrop-filter:blur(10px);
+            height:fit-content;
+        }
+
+        .sidebar h2{
+            margin-bottom:20px;
+        }
+
+        /* FORM */
+
+        .form-group{
+            margin-bottom:14px;
+        }
+
+        .form-group label{
+            display:block;
+            margin-bottom:6px;
+            color:#94a3b8;
+            font-size:13px;
+        }
+
+        input,
+        select,
+        textarea{
+            width:100%;
+            padding:12px;
+            border-radius:12px;
+            border:1px solid rgba(255,255,255,0.08);
+            background:rgba(255,255,255,0.05);
+            color:white;
+            outline:none;
+        }
+
+        textarea{
+            resize:vertical;
+            min-height:80px;
+        }
+
+        button{
+            width:100%;
+            padding:12px;
+            border:none;
+            border-radius:12px;
+            background:linear-gradient(90deg,#2563eb,#7c3aed);
+            color:white;
+            font-weight:bold;
+            cursor:pointer;
+            transition:0.25s;
+        }
+
+        button:hover{
+            transform:scale(1.02);
+        }
+
+        /* DASHBOARD */
+
+        .dashboard{
+            display:flex;
+            flex-direction:column;
+            gap:20px;
+        }
+
+        /* SEARCH */
+
+        .search-box{
+            width:100%;
+            padding:14px;
+            border-radius:14px;
+        }
+
+        /* STATS */
+
+        .stats{
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:15px;
+        }
+
+        .stat-card{
+            background:rgba(255,255,255,0.05);
+            border:1px solid rgba(255,255,255,0.06);
+            border-radius:18px;
+            padding:20px;
+            backdrop-filter:blur(10px);
+        }
+
+        .stat-number{
+            font-size:28px;
+            font-weight:bold;
+            margin-top:10px;
+        }
+
+        /* CARDS */
+
+        .cards{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+            gap:18px;
+        }
+
+        .card{
+            background:rgba(255,255,255,0.04);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:20px;
+            padding:18px;
+            backdrop-filter:blur(10px);
+            animation:fadeIn 0.4s ease;
+            transition:0.3s;
+        }
+
+        .card:hover{
+            transform:translateY(-3px);
+            border-color:rgba(96,165,250,0.4);
+            box-shadow:0 12px 40px rgba(59,130,246,0.15);
+        }
+
+        .card-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:15px;
+        }
+
+        .doctor{
+            font-size:18px;
+            font-weight:600;
+        }
+
+        .badge{
+            padding:6px 10px;
+            border-radius:999px;
+            font-size:12px;
+        }
+
+        .verified{
+            background:rgba(34,197,94,0.15);
+            color:#22c55e;
+        }
+
+        .pending{
+            background:rgba(245,158,11,0.15);
+            color:#f59e0b;
+        }
+
+        .rating{
+            margin-top:12px;
+            display:inline-block;
+            padding:5px 12px;
+            border-radius:999px;
+            background:rgba(59,130,246,0.15);
+            color:#60a5fa;
+            font-size:12px;
+        }
+
+        .card-row{
+            margin-bottom:10px;
+            color:#cbd5e1;
+        }
+
+        /* TOAST */
+
+        .toast{
+            position:fixed;
+            top:20px;
+            right:20px;
+            background:#111827;
+            border:1px solid rgba(255,255,255,0.1);
+            padding:14px 20px;
+            border-radius:14px;
+            animation:slideIn 0.4s ease;
+            z-index:999;
+        }
+
+        /* ANIMATIONS */
+
+        @keyframes fadeIn{
+            from{
+                opacity:0;
+                transform:translateY(10px);
+            }
+            to{
+                opacity:1;
+                transform:translateY(0);
+            }
+        }
+
+        @keyframes slideIn{
+            from{
+                opacity:0;
+                transform:translateX(100px);
+            }
+            to{
+                opacity:1;
+                transform:translateX(0);
+            }
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width:900px){
+
+            .layout{
+                grid-template-columns:1fr;
+            }
+
+            .stats{
+                grid-template-columns:1fr;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <div class="logo">
+        🏥 MediTrust Admin Dashboard
+    </div>
+
+    <div class="connection" id="connection">
+        🟢 Connected
+    </div>
+</div>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+        <h2>➕ Add Appointment</h2>
+
+        <form id="appointmentForm">
+
+            <div class="form-group">
+                <label>Pasiyent ID</label>
+                <input type="number" id="patientId" required>
+            </div>
+
+            <div class="form-group">
+                <label>Həkimin adı</label>
+                <input type="text" id="doctorName" required>
+            </div>
+
+            <div class="form-group">
+                <label>Həkimlə görüş yeri</label>
+                <input type="text" id="appointmentPlace" required>
+            </div>
+
+            <div class="form-group">
+                <label>Şikayət növü</label>
+                <input type="text" id="complaintType" required>
+            </div>
+
+            <div class="form-group">
+                <label>Görüş tarixi</label>
+                <input type="datetime-local" id="appointmentDate" required>
+            </div>
+
+            <div class="form-group">
+                <label>Qiymətləndirmə</label>
+
+                <select id="rating">
+                    <option value="VERY_GOOD">
+                        ÇOX_YAXŞI - 4 Star ⭐⭐⭐⭐
+                    </option>
+
+                    <option value="THE_BEST">
+                        ƏLA - 5 Star ⭐⭐⭐⭐⭐
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Şərhiniz</label>
+                <textarea id="feedback"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Həkimdə bəyəndiyin cəhət 1</label>
+                <input type="text" id="likedAspect1">
+            </div>
+
+            <div class="form-group">
+                <label>Həkimdə bəyəndiyin cəhət 2</label>
+                <input type="text" id="likedAspect2">
+            </div>
+
+            <div class="form-group">
+                <label>Həkimə qəbul sənədi </label>
+                <input type="file" id="file">
+            </div>
+
+            <button type="submit">
+                Create Appointment
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- DASHBOARD -->
+
+    <div class="dashboard">
+
+        <input
+                class="search-box"
+                type="text"
+                id="searchInput"
+                placeholder="🔍 Search by doctor or complaint..."
+        >
+
+        <!-- STATS -->
+
+        <div class="stats">
+
+            <div class="stat-card">
+                <div>Total Appointments</div>
+                <div class="stat-number" id="totalCount">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div>TƏSDİQ EDİLİB</div>
+                <div class="stat-number" id="verifiedCount">0</div>
+            </div>
+
+            <div class="stat-card">
+                <div>YOXLANILIR</div>
+                <div class="stat-number" id="pendingCount">0</div>
+            </div>
+
+        </div>
+
+        <!-- CARDS -->
+
+        <div class="cards" id="cards"></div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+<script>
+
+    const API = "http://localhost:8082/api/v1/appointments";
+
+    const cards = document.getElementById("cards");
+
+    let appointments = [];
+
+    /* TOAST */
+
+    function showToast(message){
+
+        const toast = document.createElement("div");
+
+        toast.className = "toast";
+
+        toast.innerText = message;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        },3000);
+    }
+
+    /* DATE */
+
+    function formatDate(dateStr){
+
+        return new Date(dateStr).toLocaleString("en-GB",{
+            day:"2-digit",
+            month:"long",
+            year:"numeric",
+            hour:"2-digit",
+            minute:"2-digit"
+        });
+
+    }
+
+    /* STATS */
+
+    function updateStats(){
+
+        document.getElementById("totalCount").innerText =
+            appointments.length;
+
+        const verified =
+            appointments.filter(
+                a => a.admissionVerified
+            ).length;
+
+        document.getElementById("verifiedCount").innerText =
+            verified;
+
+        document.getElementById("pendingCount").innerText =
+            appointments.length - verified;
+    }
+
+    /* RENDER */
+
+    function render(data){
+
+        cards.innerHTML = "";
+
+        [...data].filter(app => app.admissionVerified)
+            .reverse()
+            .forEach(app => {
+
+            const div = document.createElement("div");
+
+            div.className = "card";
+
+            div.innerHTML = `
+
+            <div class="card-header">
+
+                <div class="doctor">
+                    👨‍⚕️ ${app.doctorName}
+                </div>
+
+                <div class="badge ${app.admissionVerified
+                ? 'verified'
+                : 'pending'}">
+
+                    ${app.admissionVerified
+                ? 'ADMIN ✅'
+                : 'ADMIN ⏳'}
+
+                </div>
+
+            </div>
+
+            <div class="card-row">
+                Pasiyent Id ${app.patientId}
+            </div>
+
+            <div class="card-row">
+                🏥 ${app.appointmentPlace}
+            </div>
+
+            <div class="card-row">
+                🤒 ${app.complaintType}
+            </div>
+
+            <div class="card-row">
+                📅 ${formatDate(app.appointmentDate)}
+            </div>
+
+            <div class="card-row">
+                💬 ${app.feedback || '-'}
+            </div>
+
+            <div class="card-row">
+                👍 ${app.likedAspect1 || '-'},
+                ${app.likedAspect2 || '-'}
+            </div>
+
+            <div class="card-row">
+                <span class="badge ${app.admissionDocumentPath ? 'verified' : 'pending'}">
+                    ${app.admissionDocumentPath ? 'Qəbul sənədi ✅' : 'Qəbul sənədi ❌'}
+                </span>
+            </div>
+
+            <div class="rating">
+                ⭐ ${app.rating}
+            </div>
+
+        `;
+
+            cards.appendChild(div);
+
+        });
+
+        updateStats();
+    }
+
+    /* LOAD */
+
+    async function loadAppointments(){
+
+        const response =
+            await fetch(`${API}/all`);
+
+        appointments =
+            await response.json();
+
+        render(appointments);
+    }
+
+    /* CREATE */
+
+    document.getElementById("appointmentForm")
+        .addEventListener("submit",async function(e){
+
+            e.preventDefault();
+
+            const request = {
+
+                patientId:
+                    parseInt(
+                        document.getElementById("patientId").value
+                    ),
+
+                appointmentDate:
+                document.getElementById("appointmentDate").value + ":00",
+
+                appointmentPlace:
+                document.getElementById("appointmentPlace").value,
+
+                doctorName:
+                document.getElementById("doctorName").value,
+
+                complaintType:
+                document.getElementById("complaintType").value,
+
+                rating:
+                document.getElementById("rating").value,
+
+                feedback:
+                document.getElementById("feedback").value,
+
+                likedAspect1:
+                document.getElementById("likedAspect1").value,
+
+                likedAspect2:
+                document.getElementById("likedAspect2").value
+
+            };
+
+            const formData = new FormData();
+
+            formData.append(
+                "data",
+                new Blob(
+                    [JSON.stringify(request)],
+                    {type:"application/json"}
+                )
+            );
+
+            const fileInput =
+                document.getElementById("file");
+
+            if(fileInput.files.length > 0){
+
+                formData.append(
+                    "file",
+                    fileInput.files[0]
+                );
+            }
+
+            const response = await fetch(`${API}/add`,{
+
+                method:"POST",
+                body:formData
+
+            });
+
+            if(!response.ok){
+
+                const error = await response.text();
+
+                alert("ERROR: " + error);
+
+                return;
+            }
+
+            showToast("Appointment created 🚀");
+
+            document.getElementById("appointmentForm").reset();
+
+            loadAppointments();
+
+        });
+
+    /* SEARCH */
+
+    document.getElementById("searchInput")
+        .addEventListener("input",function(e){
+
+            const value =
+                e.target.value.toLowerCase();
+
+            const filtered =
+                appointments.filter(app =>
+
+                    app.doctorName
+                        .toLowerCase()
+                        .includes(value)
+
+                    ||
+
+                    app.complaintType
+                        .toLowerCase()
+                        .includes(value)
+
+                );
+
+            render(filtered);
+
+        });
+
+    /* WEBSOCKET */
+
+    const socket =
+        new SockJS(
+            "http://localhost:8082/ws"
+        );
+
+    const stompClient =
+        Stomp.over(socket);
+
+    stompClient.debug = null;
+
+    stompClient.connect({},function(){
+
+        loadAppointments();
+
+        stompClient.subscribe(
+            "/topic/appointments",
+            function(){
+
+                showToast(
+                    "Live update received ⚡"
+                );
+
+                loadAppointments();
+
+            });
+
+    });
+
+</script>
+
+</body>
+</html>
