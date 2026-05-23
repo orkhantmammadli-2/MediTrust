@@ -63,11 +63,14 @@ public class AppointmentController {
     }
 
     @Operation(summary = "Updating appointment by Id")
-    @PutMapping("/{id}")
-    public ResponseEntity<AppointmentResponse> updateAppointmentById(@PathVariable Long id, @Valid @RequestBody AppointmentRequest request){
-        AppointmentResponse appointmentResponse = appointmentServiceImpl.updateAppointment(id, request);
-        log.info("Update appointment by ID successfully");
-        return new ResponseEntity<>(appointmentResponse, HttpStatus.OK);
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<AppointmentResponse> updateAppointmentById(@PathVariable Long id, @RequestPart("data") String requestJson,
+                                                                     @RequestPart(value = "file", required = false)
+                                                                         MultipartFile file) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();mapper.registerModule(new JavaTimeModule());
+        AppointmentRequest request = mapper.readValue(requestJson, AppointmentRequest.class);
+        AppointmentResponse response = appointmentServiceImpl.updateAppointment(id, request, file);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Get all Appointments by Patient Id")

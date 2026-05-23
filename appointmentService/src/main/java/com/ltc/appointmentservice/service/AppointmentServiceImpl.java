@@ -87,11 +87,36 @@ public class AppointmentServiceImpl implements AppointmentService{
                 .toList();}
 
     @Override
-    public AppointmentResponse updateAppointment(Long id, AppointmentRequest request) {
+    public AppointmentResponse updateAppointment(Long id, AppointmentRequest request, MultipartFile file) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(()-> new AppointmentNotFound("Appointment not found with id " + id));
-        appointmentMapper.updateAppointment(request, appointment);
-        appointment.setAdmissionVerified(true);
+        appointment.setAppointmentDate(request.getAppointmentDate());
+        appointment.setAppointmentPlace(request.getAppointmentPlace());
+        appointment.setDoctorName(request.getDoctorName());
+        appointment.setAdmissionVerified(false);
+        appointment.setComplaintType(request.getComplaintType());
+        appointment.setRating(request.getRating());
+        appointment.setFeedback(request.getFeedback());
+        appointment.setLikedAspect1(request.getLikedAspect1());
+        appointment.setLikedAspect2(request.getLikedAspect2());
+        if (file != null && !file.isEmpty()) { MultiValueMap<String, Object> body =
+                    new LinkedMultiValueMap<>(); try { body.add("file",
+                        new MultipartInputStreamFileResource(
+                                file.getInputStream(),
+                                file.getOriginalFilename()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            HttpEntity<MultiValueMap<String, Object>>
+                    requestEntity =
+                    new HttpEntity<>(body, headers);
+            ResponseEntity<FileUploadResponse> uploadResponse = restTemplate.postForEntity(
+                            "http://localhost:8088/api/v1/files/upload",
+                            requestEntity,
+                            FileUploadResponse.class);
+            appointment.setAdmissionDocumentPath(
+                    uploadResponse.getBody().getFileUrl());}
         Appointment updated = appointmentRepository.save(appointment);
         return appointmentMapper.toResponse(updated);}
 

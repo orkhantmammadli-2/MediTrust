@@ -12,7 +12,7 @@ public interface AppointmentService {
     AppointmentResponse getById (Long id);
     List<AppointmentResponse> getAll();
     List<AppointmentResponse> getByPatientId (Long patientId);
-    AppointmentResponse updateAppointment (Long id, AppointmentRequest request);
+    AppointmentResponse updateAppointment (Long id, AppointmentRequest request, MultipartFile file);
     void deleteById (Long id);
     public void verifyAppointment(Long id);
 }
