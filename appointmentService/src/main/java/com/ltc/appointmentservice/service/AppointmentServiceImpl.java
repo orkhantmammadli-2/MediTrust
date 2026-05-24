@@ -1,10 +1,7 @@
 package com.ltc.appointmentservice.service;
 
 import com.ltc.appointmentservice.configuration.MultipartInputStreamFileResource;
-import com.ltc.appointmentservice.dto.AppointmentRequest;
-import com.ltc.appointmentservice.dto.AppointmentResponse;
-import com.ltc.appointmentservice.dto.FileUploadResponse;
-import com.ltc.appointmentservice.dto.NotificationMessage;
+import com.ltc.appointmentservice.dto.*;
 import com.ltc.appointmentservice.entity.Appointment;
 import com.ltc.appointmentservice.exception.AppointmentNotFound;
 import com.ltc.appointmentservice.feign.PatientClient;
@@ -21,6 +18,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import com.ltc.sharedevents.dto.AppointmentCreatedEvent;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,12 +32,14 @@ public class AppointmentServiceImpl implements AppointmentService{
     private final PatientClient patientClient;
     private final RestTemplate restTemplate;
     private final SimpMessagingTemplate messagingTemplate;
-    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper, PatientClient patientClient, RestTemplate restTemplate, SimpMessagingTemplate messagingTemplate) {
+    private final KafkaProducerService kafkaProducerService;
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper, PatientClient patientClient, RestTemplate restTemplate, SimpMessagingTemplate messagingTemplate, KafkaProducerService kafkaProducerService) {
         this.appointmentRepository = appointmentRepository;
         this.appointmentMapper = appointmentMapper;
         this.patientClient = patientClient;
         this.restTemplate = restTemplate;
         this.messagingTemplate = messagingTemplate;
+        this.kafkaProducerService = kafkaProducerService;
     }
 
 
@@ -62,6 +62,16 @@ public class AppointmentServiceImpl implements AppointmentService{
         Appointment savedAppointment = appointmentRepository.save(appointment);
         AppointmentResponse response = appointmentMapper.toResponse(savedAppointment);
         messagingTemplate.convertAndSend("/topic/appointments", response);
+        kafkaProducerService.sendAppointmentCreatedEvent(
+                new AppointmentCreatedEvent(
+                        savedAppointment.getId(),
+                        savedAppointment.getPatientId(),
+                        savedAppointment.getDoctorName(),
+                        savedAppointment.getAppointmentPlace(),
+                        savedAppointment.getComplaintType(),
+                        savedAppointment.getFeedback(),
+                        savedAppointment.getLikedAspect1(),
+                        savedAppointment.getLikedAspect2()));
         return response;
     }
 
