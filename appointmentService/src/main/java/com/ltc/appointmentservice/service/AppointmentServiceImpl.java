@@ -7,6 +7,7 @@ import com.ltc.appointmentservice.exception.AppointmentNotFound;
 import com.ltc.appointmentservice.feign.PatientClient;
 import com.ltc.appointmentservice.mapper.AppointmentMapper;
 import com.ltc.appointmentservice.repository.AppointmentRepository;
+import com.ltc.sharedevents.dto.AppointmentVerifiedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -139,15 +140,20 @@ public class AppointmentServiceImpl implements AppointmentService{
     @Override
     public void verifyAppointment(Long id) {
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(() ->
-                                new AppointmentNotFound("Not found")
-                        );
+                                new AppointmentNotFound("Not found"));
         appointment.setAdmissionVerified(true);
         appointmentRepository.save(appointment);
-        messagingTemplate.convertAndSend(
-                "/topic/appointments",
-                new NotificationMessage(
-                        "APPOINTMENT_VERIFIED"
-                )
-        );
+        messagingTemplate.convertAndSend("/topic/appointments",
+                new NotificationMessage("APPOINTMENT_VERIFIED"));
+        kafkaProducerService.sendAppointmentVerifiedEvent(
+                new AppointmentVerifiedEvent(
+                        appointment.getId(),
+                        appointment.getPatientId(),
+                        appointment.getDoctorName(),
+                        appointment.getAppointmentPlace(),
+                        appointment.getComplaintType(),
+                        appointment.getFeedback(),
+                        appointment.getLikedAspect1(),
+                        appointment.getLikedAspect2()));
     }
 }
