@@ -1,0 +1,21 @@
+type Appointment {
+    id: ID
+    patientId: Int
+    appointmentDate: String
+    appointmentPlace: String
+    doctorName: String
+    complaintType: String
+    feedback: String
+    likedAspect1: String
+    likedAspect2: String
+    admissionVerified: Boolean
+}
+
+type Query {
+    getAllAppointments: [Appointment]
+    getAppointmentById(id: ID): Appointment
+}
+
+type Mutation {
+    verifyAppointment(id: ID): String
+}

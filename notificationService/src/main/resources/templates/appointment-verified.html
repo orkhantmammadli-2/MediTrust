@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body style="
+    font-family: Arial, sans-serif;
+    background-color:#f4f4f4;
+    padding:20px;
+">
+
+<div style="
+    max-width:600px;
+    margin:auto;
+    background:white;
+    border-radius:10px;
+    padding:30px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+">
+
+    <h2 style="color:#2130FD;">
+        📅 Appointment Verified Successfully
+    </h2>
+
+    <p>
+        Your appointment has been successfully verified by Admin.
+    </p>
+
+    <hr>
+
+    <p>
+        <b>Appointment ID:</b>
+        <span th:text="${id}"></span>
+    </p>
+
+    <p>
+        <b>Doctor:</b>
+        <span th:text="${doctorName}"></span>
+    </p>
+
+    <p>
+        <b>Hospital:</b>
+        <span th:text="${place}"></span>
+    </p>
+
+    <p>
+        <b>Complaint:</b>
+        <span th:text="${complaint}"></span>
+    </p>
+
+    <hr>
+
+    <p style="color:gray;font-size:12px;">
+        MediTrust Notification Service
+    </p>
+
+</div>
+
+</body>
+</html>

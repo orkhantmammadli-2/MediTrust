@@ -16,6 +16,19 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ordukhanm20@gmail.com
+    password: nlgvcvernqihrcjl
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.gmail.com
 logging:
   level:
     root: INFO
