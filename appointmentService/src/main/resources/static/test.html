@@ -131,7 +131,7 @@
         /* SEARCH */
 
         .search-box{
-            width:100%;
+            width:50%;
             padding:14px;
             border-radius:14px;
         }
@@ -140,7 +140,7 @@
 
         .stats{
             display:grid;
-            grid-template-columns:repeat(3,1fr);
+            grid-template-columns:repeat(6,1fr);
             gap:15px;
         }
 
@@ -148,7 +148,7 @@
             background:rgba(255,255,255,0.05);
             border:1px solid rgba(255,255,255,0.06);
             border-radius:18px;
-            padding:20px;
+            padding:10px;
             backdrop-filter:blur(10px);
         }
 
@@ -162,8 +162,8 @@
 
         .cards{
             display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-            gap:18px;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:20px;
         }
 
         .card{
@@ -288,7 +288,7 @@
     </div>
 
     <div class="connection" id="connection">
-        🟢 Connected
+        🟢 Connected 😁
     </div>
 </div>
 
@@ -298,7 +298,7 @@
 
     <div class="sidebar">
 
-        <h2>➕ Add Appointment</h2>
+        <h2>➕ New Appointment</h2>
 
         <form id="appointmentForm">
 
@@ -332,11 +332,11 @@
 
                 <select id="rating">
                     <option value="VERY_GOOD">
-                        ÇOX_YAXŞI - 4 Star ⭐⭐⭐⭐
+                        ÇOX_YAXŞI
                     </option>
 
                     <option value="THE_BEST">
-                        ƏLA - 5 Star ⭐⭐⭐⭐⭐
+                        ƏLA
                     </option>
                 </select>
             </div>
@@ -377,7 +377,7 @@
                 class="search-box"
                 type="text"
                 id="searchInput"
-                placeholder="🔍 Search by doctor or complaint..."
+                placeholder="🔍 Search by ..."
         >
 
         <!-- STATS -->
@@ -550,13 +550,57 @@
 
     /* LOAD */
 
+    // async function loadAppointments(){
+    //
+    //     const response =
+    //         await fetch(`${API}/all`);
+    //
+    //     appointments =
+    //         await response.json();
+    //
+    //     render(appointments);
+    // }
+
+    const GRAPHQL_API = "http://localhost:8082/graphql";
+
     async function loadAppointments(){
 
-        const response =
-            await fetch(`${API}/all`);
+        const query = `
+        query {
+            getAllAppointments {
+                id
+                patientId
+                doctorName
+                appointmentPlace
+                complaintType
+                appointmentDate
+                feedback
+                likedAspect1
+                likedAspect2
+                rating
+                admissionVerified
+                admissionDocumentPath
+            }
+        }
+    `;
 
-        appointments =
-            await response.json();
+        const response = await fetch(GRAPHQL_API, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                query: query
+            })
+
+        });
+
+        const result = await response.json();
+
+        appointments = result.data.getAllAppointments;
 
         render(appointments);
     }
@@ -648,28 +692,86 @@
 
     /* SEARCH */
 
+    // document.getElementById("searchInput")
+    //     .addEventListener("input",function(e){
+    //
+    //         const value =
+    //             e.target.value.toLowerCase();
+    //
+    //         const filtered =
+    //             appointments.filter(app =>
+    //
+    //                 app.doctorName
+    //                     .toLowerCase()
+    //                     .includes(value)
+    //
+    //                 ||
+    //
+    //                 app.complaintType
+    //                     .toLowerCase()
+    //                     .includes(value)
+    //
+    //             );
+    //
+    //         render(filtered);
+    //
+    //     });
+
+    /* SEARCH - GraphQL */
+
     document.getElementById("searchInput")
-        .addEventListener("input",function(e){
+        .addEventListener("input", async function(e){
 
-            const value =
-                e.target.value.toLowerCase();
+            const value = e.target.value;
 
-            const filtered =
-                appointments.filter(app =>
+            if(value.trim() === ""){
 
-                    app.doctorName
-                        .toLowerCase()
-                        .includes(value)
+                loadAppointments();
+                return;
+            }
 
-                    ||
+            const query = `
 
-                    app.complaintType
-                        .toLowerCase()
-                        .includes(value)
+            query {
 
-                );
+                searchAppointments(keyword: "${value}") {
 
-            render(filtered);
+                    id
+                    patientId
+                    doctorName
+                    appointmentPlace
+                    complaintType
+                    appointmentDate
+                    feedback
+                    likedAspect1
+                    likedAspect2
+                    rating
+                    admissionVerified
+                    admissionDocumentPath
+
+                }
+
+            }
+
+        `;
+
+            const response = await fetch(GRAPHQL_API, {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    query: query
+                })
+
+            });
+
+            const result = await response.json();
+
+            render(result.data.searchAppointments);
 
         });
 

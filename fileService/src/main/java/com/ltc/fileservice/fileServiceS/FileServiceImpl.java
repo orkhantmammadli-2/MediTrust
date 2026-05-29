@@ -65,7 +65,7 @@ public class FileServiceImpl implements FileServiceMethods {
                     fileUrl
             );
 
-        } catch (Exception e) { throw new RuntimeException("File upload failed");}
+        } catch (Exception e) { e.printStackTrace(); throw new RuntimeException("File upload failed" + e.getMessage());}
 
         }
     }

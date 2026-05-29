@@ -30,20 +30,10 @@ public class AppointmentGraphQLController {
         return repository.findById(id)
                 .orElseThrow();
     }
-
-    @MutationMapping
-    public String verifyAppointment(
-            @Argument Long id
+    @QueryMapping
+    public List<Appointment> searchAppointments(
+            @Argument String keyword
     ) {
-
-        Appointment appointment =
-                repository.findById(id)
-                        .orElseThrow();
-
-        appointment.setAdmissionVerified(true);
-
-        repository.save(appointment);
-
-        return "Appointment verified";
+        return repository.searchAppointments(keyword);
     }
 }

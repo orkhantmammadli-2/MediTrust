@@ -9,13 +9,12 @@ type Appointment {
     likedAspect1: String
     likedAspect2: String
     admissionVerified: Boolean
+    rating: String
+    admissionDocumentPath: String
 }
 
 type Query {
     getAllAppointments: [Appointment]
     getAppointmentById(id: ID): Appointment
-}
-
-type Mutation {
-    verifyAppointment(id: ID): String
+    searchAppointments(keyword: String): [Appointment]
 }
