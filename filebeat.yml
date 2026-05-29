@@ -1,7 +1,14 @@
 filebeat.inputs:
+
   - type: filestream
+    id: meditrust-logs
     enabled: true
+
     paths:
       - /logs/*.log
+
 output.elasticsearch:
   hosts: ["http://elasticsearch:9200"]
+
+setup.kibana:
+  host: "kibana:5601"

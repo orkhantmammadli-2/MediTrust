@@ -55,7 +55,7 @@ public class KafkaConsumerConfig {
     return new DefaultErrorHandler( recoverer,
             new FixedBackOff(
                     2000L,
-                    3));}
+                    1));}
     @Bean
     public NewTopic appointmentCreatedDltTopic() {
         return TopicBuilder
