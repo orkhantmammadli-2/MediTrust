@@ -12,9 +12,20 @@ type Appointment {
     rating: String
     admissionDocumentPath: String
 }
+input AppointmentFilter {
+    doctorName: String
+    complaintType: String
+    appointmentPlace: String
+    likedAspect1: String
+    likedAspect2: String
+    feedback: String
+    rating: String
+    admissionVerified: Boolean
+}
 
 type Query {
     getAllAppointments: [Appointment]
     getAppointmentById(id: ID): Appointment
-    searchAppointments(keyword: String): [Appointment]
+    searchAppointments(filter: AppointmentFilter): [Appointment]
+
 }

@@ -2,6 +2,7 @@ package com.ltc.notificationservice.kafka;
 
 import com.ltc.notificationservice.email.EmailService;
 import com.ltc.notificationservice.email.EmailTemplateService;
+import com.ltc.notificationservice.webhook.TelegramService;
 import com.ltc.notificationservice.webhook.WebhookService;
 import com.ltc.sharedevents.dto.AppointmentCreatedEvent;
 import com.ltc.sharedevents.dto.AppointmentVerifiedEvent;
@@ -19,10 +20,12 @@ public class AppointmentConsumer {
     private final EmailService emailService;
     private final EmailTemplateService emailTemplateService;
     private final WebhookService webhookService;
-    public AppointmentConsumer(EmailService emailService, EmailTemplateService emailTemplateService, WebhookService webhookService) {
+    private final TelegramService telegramService;
+    public AppointmentConsumer(EmailService emailService, EmailTemplateService emailTemplateService, WebhookService webhookService, TelegramService telegramService) {
         this.emailService = emailService;
         this.emailTemplateService = emailTemplateService;
         this.webhookService = webhookService;
+        this.telegramService = telegramService;
     }
 
 
@@ -32,17 +35,15 @@ public class AppointmentConsumer {
     )
     public void consume(
             AppointmentCreatedEvent appointmentCreatedEvent)
-    {   String html = emailTemplateService.buildAppointmentCreated(appointmentCreatedEvent);
+    {   if (appointmentCreatedEvent.appointmentId() == 20) {throw new RuntimeException();}
+        String html = emailTemplateService.buildAppointmentCreated(appointmentCreatedEvent);
         emailService.sendHtmlEmail(
             "orkhantmammadli@outlook.com",
             "New Appointment",
             html);
         log.info("Consumer received appointment created event: {}",
                 appointmentCreatedEvent);
-    if (appointmentCreatedEvent.appointmentId() == 17) {
-    throw new RuntimeException();}
     }
-
     @KafkaListener(
             topics = "appointment-verified",
             groupId = "notification-group"
@@ -66,6 +67,7 @@ public class AppointmentConsumer {
             AppointmentCreatedEvent appointmentCreatedEvent) {
         dlqLogger.error( "DLQ EVENT RECEIVED: {}",
                 appointmentCreatedEvent);
+        telegramService.sendDlqAlert(appointmentCreatedEvent);
         webhookService.sendDlqAlert(appointmentCreatedEvent);
     }
 
