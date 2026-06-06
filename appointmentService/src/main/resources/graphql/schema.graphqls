@@ -21,11 +21,11 @@ input AppointmentFilter {
     feedback: String
     rating: String
     admissionVerified: Boolean
+    hasDocument: Boolean
 }
 
 type Query {
     getAllAppointments: [Appointment]
     getAppointmentById(id: ID): Appointment
     searchAppointments(filter: AppointmentFilter): [Appointment]
-
 }

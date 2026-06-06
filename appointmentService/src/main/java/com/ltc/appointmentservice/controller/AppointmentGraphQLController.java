@@ -74,8 +74,8 @@ public class AppointmentGraphQLController {
                                         filter.feedback()
                                 ),
                         AppointmentSpecifications
-                                .isVerified(
-                                        filter.admissionVerified()
+                                .hasDocument(
+                                        filter.hasDocument()
                                 )
 
                 );

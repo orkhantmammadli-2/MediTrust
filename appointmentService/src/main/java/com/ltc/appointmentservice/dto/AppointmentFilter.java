@@ -8,5 +8,7 @@ public record AppointmentFilter(
         String likedAspect2,
         String feedback,
         String rating,
-        Boolean admissionVerified) {
+        Boolean admissionVerified,
+        Boolean hasDocument
+) {
 }

@@ -4,6 +4,9 @@ import com.ltc.appointmentservice.entity.Appointment;
 import org.springframework.data.jpa.domain.Specification;
 
 public class AppointmentSpecifications {
+
+
+
     public static Specification<Appointment>
     hasDoctorName(String doctorName) {
         return (root, query, cb) ->
@@ -63,20 +66,33 @@ public class AppointmentSpecifications {
                         );
     }
     public static Specification<Appointment>
-    isVerified(Boolean verified) {
+    hasDocument(Boolean hasDocument) {
 
         return (root, query, cb) ->
 
-                verified == null
+                hasDocument == null
 
                         ? null
 
                         :
 
-                        cb.equal(
-                                root.get("admissionVerified"),
-                                verified
-                        );
+                        hasDocument
+
+                        ?
+
+                                cb.isNotNull(
+                                        root.get(
+                                                "admissionDocumentPath"
+                                        )
+                                )
+
+                        :
+
+                                cb.isNull(
+                                        root.get(
+                                                "admissionDocumentPath"
+                                        )
+                                );
     }
     public static Specification<Appointment>
     hasLikedAspect1(String likedAspect1) {
@@ -113,7 +129,7 @@ public class AppointmentSpecifications {
 
                         cb.like(
                                 cb.lower(
-                                        root.get("likedAspect1")
+                                        root.get("likedAspect2")
                                 ),
                                 "%" +
                                         likedAspect2.toLowerCase()
@@ -134,7 +150,7 @@ public class AppointmentSpecifications {
 
                         cb.like(
                                 cb.lower(
-                                        root.get("likedAspect1")
+                                        root.get("rating")
                                 ),
                                 "%" +
                                         rating.toLowerCase()
@@ -155,7 +171,7 @@ public class AppointmentSpecifications {
 
                         cb.like(
                                 cb.lower(
-                                        root.get("likedAspect1")
+                                        root.get("feedback")
                                 ),
                                 "%" +
                                         fedback.toLowerCase()
