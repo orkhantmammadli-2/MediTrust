@@ -6,10 +6,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ltc.appointmentservice.dto.AppointmentRequest;
 import com.ltc.appointmentservice.dto.AppointmentResponse;
+import com.ltc.appointmentservice.dto.AppointmentStatsResponse;
 import com.ltc.appointmentservice.service.AppointmentServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,11 +46,18 @@ public class AppointmentController {
 
     @Operation(summary = "Show all appointments")
     @GetMapping("/all")
-    public ResponseEntity<List<AppointmentResponse>> allAppointments() {
-    List<AppointmentResponse> appointmentResponse = appointmentServiceImpl.getAll();
+    public ResponseEntity<Page<AppointmentResponse>> allAppointments(@ParameterObject @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+    Page<AppointmentResponse> appointmentResponse = appointmentServiceImpl.getAll(pageable);
     log.info("All appointments successfully");
     return new ResponseEntity<>(appointmentResponse, HttpStatus.ACCEPTED);
     }
+    @Operation(summary = "Showing verified")
+    @GetMapping("/verified")
+    public ResponseEntity<Page<AppointmentResponse>> getVerified(
+            @ParameterObject
+            @PageableDefault(page = 0, size = 5, sort = "id")
+            Pageable pageable){ return ResponseEntity.ok(
+                appointmentServiceImpl.getVerified(pageable));}
 
     @Operation(summary = "Get appointment by ID")
     @GetMapping("/{id}")
@@ -86,5 +99,9 @@ public class AppointmentController {
     public ResponseEntity<String> verifyAppointment( @PathVariable Long id) {
         appointmentServiceImpl.verifyAppointment(id);
         return ResponseEntity.ok("Appointment verified successfully");
+    }
+    @GetMapping("/stats")
+    public ResponseEntity<AppointmentStatsResponse>
+    getStats() {return ResponseEntity.ok(appointmentServiceImpl.getStats());
     }
 }

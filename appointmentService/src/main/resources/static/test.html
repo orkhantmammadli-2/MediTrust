@@ -198,19 +198,38 @@
         /* CARDS */
 
         .cards{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            display:flex;
+            flex-direction:column;
             gap:20px;
         }
 
         .card{
+            width:100%;
+            min-height:220px;
+
             background:rgba(255,255,255,0.04);
             border:1px solid rgba(255,255,255,0.08);
             border-radius:20px;
-            padding:18px;
+
+            padding:20px;
+
             backdrop-filter:blur(10px);
-            animation:fadeIn 0.4s ease;
-            transition:0.3s;
+        }
+        .feedback-box{
+            margin-top:15px;
+
+            padding:15px;
+
+            border-radius:12px;
+
+            background:
+                    rgba(255,255,255,0.05);
+
+            line-height:1.6;
+
+            color:#e2e8f0;
+
+            word-break:break-word;
         }
 
         .card:hover{
@@ -260,6 +279,24 @@
         .card-row{
             margin-bottom:10px;
             color:#cbd5e1;
+        }
+
+        #pagination{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            gap:20px;
+            margin-top:20px;
+        }
+
+        #pagination button{
+            width:auto;
+            padding:10px 20px;
+        }
+
+        #pageInfo{
+            font-weight:bold;
+            font-size:16px;
         }
 
         /* TOAST */
@@ -325,7 +362,7 @@
     </div>
 
     <div class="connection" id="connection">
-        🟢 Connected 😁
+        🟢 Connected 😊
     </div>
 </div>
 
@@ -477,6 +514,22 @@
 
         <div class="cards" id="cards"></div>
 
+        <div id="pagination">
+
+            <button id="prevBtn">
+                ⬅ Previous
+            </button>
+
+            <span id="pageInfo">
+                Page 1
+            </span>
+
+            <button id="nextBtn">
+                Next ➡
+            </button>
+
+        </div>
+
     </div>
 
 </div>
@@ -525,22 +578,20 @@
 
     /* STATS */
 
-    function updateStats(data){
 
-        document.getElementById("totalCount").innerText =
-            data.length;
-
-        const verified =
-            data.filter(
-                a => a.admissionVerified
-            ).length;
-
-        document.getElementById("verifiedCount").innerText =
-            verified;
-
-        document.getElementById("pendingCount").innerText =
-            data.length - verified;
-    }
+    // function updateStats(data){
+    //
+    //     document.getElementById("totalCount").innerText =
+    //         totalAppointments;
+    //
+    //     const verified = data.filter(a => a.admissionVerified).length;
+    //
+    //     document.getElementById("verifiedCount").innerText =
+    //         verified;
+    //
+    //     document.getElementById("pendingCount").innerText =
+    //         data.length - verified;
+    // }
 
     /* RENDER */
 
@@ -548,7 +599,7 @@
 
         cards.innerHTML = "";
 
-        [...data].filter(app => app.admissionVerified)
+        [...data]
             .reverse()
             .forEach(app => {
 
@@ -592,7 +643,7 @@
                 📅 ${formatDate(app.appointmentDate)}
             </div>
 
-            <div class="card-row">
+            <div class="feedback-box">
                 💬 ${app.feedback || '-'}
             </div>
 
@@ -617,53 +668,60 @@
 
         });
 
-        updateStats(data);
+        loadStats(data);
     }
 
     /* LOAD */
 
     const GRAPHQL_API = "http://localhost:8082/graphql";
 
+    let currentPage = 0;
+
+    const pageSize = 5;
+
+    let totalPages = 0;
+
+    let totalAppointments = 0;
+
     async function loadAppointments(){
 
-        const query = `
-        query {
-            getAllAppointments {
-                id
-                patientId
-                doctorName
-                appointmentPlace
-                complaintType
-                appointmentDate
-                feedback
-                likedAspect1
-                likedAspect2
-                rating
-                admissionVerified
-                admissionDocumentPath
-            }
-        }
-    `;
-
-        const response = await fetch(GRAPHQL_API, {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-                query: query
-            })
-
-        });
+        const response = await fetch(
+            `${API}/verified?page=${currentPage}&size=${pageSize}`
+        );
 
         const result = await response.json();
 
-        appointments = result.data.getAllAppointments;
+        appointments = result.content;
+
+        totalPages = result.totalPages;
+
+        totalAppointments = result.totalElements;
+
+        document.getElementById(
+            "pageInfo"
+        ).innerText =
+            `Page ${result.number + 1} / ${result.totalPages}`;
 
         render(appointments);
+    }
+    async function loadStats(){
+
+        const response =
+            await fetch(
+                `${API}/stats`
+            );
+
+        const stats =
+            await response.json();
+
+        document.getElementById("totalCount").innerText =
+            stats.totalAppointments;
+
+        document.getElementById("verifiedCount").innerText =
+            stats.verifiedAppointments;
+
+        document.getElementById("pendingCount").innerText =
+            stats.pendingAppointments;
     }
     async function filterAppointments(){
 
@@ -882,6 +940,30 @@
             "input",
             filterAppointments
         );
+    document
+        .getElementById("prevBtn")
+        .addEventListener("click", () => {
+
+            if(currentPage > 0){
+
+                currentPage--;
+
+                loadAppointments();
+            }
+
+        });
+    document
+        .getElementById("nextBtn")
+        .addEventListener("click", () => {
+
+            if(currentPage < totalPages - 1){
+
+                currentPage++;
+
+                loadAppointments();
+            }
+
+        });
 
     /* WEBSOCKET */
 
@@ -898,6 +980,7 @@
     stompClient.connect({},function(){
 
         loadAppointments();
+        loadStats();
 
         stompClient.subscribe(
             "/topic/appointments",
@@ -908,6 +991,7 @@
                 );
 
                 loadAppointments();
+                loadStats();
 
             });
 

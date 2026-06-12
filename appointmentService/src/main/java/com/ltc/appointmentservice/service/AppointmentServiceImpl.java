@@ -9,6 +9,10 @@ import com.ltc.appointmentservice.mapper.AppointmentMapper;
 import com.ltc.appointmentservice.repository.AppointmentRepository;
 import com.ltc.sharedevents.dto.AppointmentVerifiedEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -34,6 +38,7 @@ public class AppointmentServiceImpl implements AppointmentService{
     private final RestTemplate restTemplate;
     private final SimpMessagingTemplate messagingTemplate;
     private final KafkaProducerService kafkaProducerService;
+    private final static String APPOINT_CACHE_NAME = "appointCache";
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper, PatientClient patientClient, RestTemplate restTemplate, SimpMessagingTemplate messagingTemplate, KafkaProducerService kafkaProducerService) {
         this.appointmentRepository = appointmentRepository;
         this.appointmentMapper = appointmentMapper;
@@ -77,6 +82,7 @@ public class AppointmentServiceImpl implements AppointmentService{
     }
 
     @Override
+    @Cacheable(value = "APPOINT_CACHE_NAME", key = "#id")
     public AppointmentResponse getById(Long id) {
         Appointment appointment = appointmentRepository
                 .findById(id).orElseThrow(()-> new AppointmentNotFound
@@ -85,12 +91,19 @@ public class AppointmentServiceImpl implements AppointmentService{
     }
 
     @Override
-    public List<AppointmentResponse> getAll() {
-        return appointmentRepository.findAll().stream()
-                .map(appointmentMapper::toResponse).toList();
+    public Page<AppointmentResponse> getAll(Pageable pageable) {
+        return appointmentRepository.findAll(pageable)
+                .map(appointmentMapper::toResponse);
     }
 
     @Override
+    public Page<AppointmentResponse> getVerified(Pageable pageable) {
+        return appointmentRepository.findByAdmissionVerifiedTrue(pageable)
+                .map(appointmentMapper::toResponse);
+    }
+
+    @Override
+    @Cacheable(value = "APPOINT_CACHE_NAME", key = "#patientId")
     public List<AppointmentResponse> getByPatientId(Long patientId) {
         return appointmentRepository.findByPatientId(patientId)
                 .stream()
@@ -132,6 +145,7 @@ public class AppointmentServiceImpl implements AppointmentService{
         return appointmentMapper.toResponse(updated);}
 
     @Override
+    @CacheEvict(value = "APPOINT_CACHE_NAME", key = "#id")
     public void deleteById(Long id) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(()-> new AppointmentNotFound("Appointment not found with id " + id));
@@ -155,5 +169,22 @@ public class AppointmentServiceImpl implements AppointmentService{
                         appointment.getFeedback(),
                         appointment.getLikedAspect1(),
                         appointment.getLikedAspect2()));
+    }
+
+    public AppointmentStatsResponse getStats() {
+        long total = appointmentRepository.count();
+        long verified = appointmentRepository
+                        .findAll()
+                        .stream()
+                        .filter(
+                                Appointment::isAdmissionVerified
+                        )
+                        .count();
+        long pending = total - verified;
+        return new AppointmentStatsResponse(
+                total,
+                verified,
+                pending
+        );
     }
 }

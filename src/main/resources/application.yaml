@@ -1,5 +1,8 @@
 server:
   port: 8080
+jwt:
+  secret-key: 1234567890123456789012345678901234567890123456789012345678901234
+  access-expiration: 86400000
 spring:
   application:
     name: MediTrust
@@ -50,6 +53,10 @@ spring:
                   args:
                     name: fileCircuitBreaker
                     fallbackUri: forward:/fallback/file
+            - id: auth-route
+              uri: http://localhost:8081
+              predicates:
+                - Path=/api/v1/auth/**
 resilience4j:
   circuitbreaker:
     instances:
