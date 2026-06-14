@@ -18,7 +18,7 @@ jobs:
 
     steps:
 
-      - name: Checkout Project
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Java 17
@@ -27,8 +27,8 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Grant execute permission
-        run: chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Run Tests
         run: ./gradlew test
