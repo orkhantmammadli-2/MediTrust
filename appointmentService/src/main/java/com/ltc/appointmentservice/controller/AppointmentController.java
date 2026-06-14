@@ -7,9 +7,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ltc.appointmentservice.dto.AppointmentRequest;
 import com.ltc.appointmentservice.dto.AppointmentResponse;
 import com.ltc.appointmentservice.dto.AppointmentStatsResponse;
+import com.ltc.appointmentservice.dto.MonthlyInsightResponse;
 import com.ltc.appointmentservice.service.AppointmentServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -19,6 +19,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
@@ -35,6 +36,7 @@ public class AppointmentController {
     }
     @Operation(summary = "Add a new appointment")
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<AppointmentResponse>
     addAppointment( @RequestPart("data") String requestJson,
                     @RequestPart(value = "file", required = false) MultipartFile file)
@@ -46,6 +48,7 @@ public class AppointmentController {
 
     @Operation(summary = "Show all appointments")
     @GetMapping("/all")
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<Page<AppointmentResponse>> allAppointments(@ParameterObject @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
     Page<AppointmentResponse> appointmentResponse = appointmentServiceImpl.getAll(pageable);
     log.info("All appointments successfully");
@@ -53,6 +56,7 @@ public class AppointmentController {
     }
     @Operation(summary = "Showing verified")
     @GetMapping("/verified")
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<Page<AppointmentResponse>> getVerified(
             @ParameterObject
             @PageableDefault(page = 0, size = 5, sort = "id")
@@ -61,6 +65,7 @@ public class AppointmentController {
 
     @Operation(summary = "Get appointment by ID")
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<AppointmentResponse> getAppointmentById(@PathVariable Long id){
         AppointmentResponse appointmentResponse = appointmentServiceImpl.getById(id);
         log.info("Get appointment by ID successfully");
@@ -69,6 +74,7 @@ public class AppointmentController {
 
     @Operation(summary = "Delete appointment by ID")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> deleteAppointmentById(@PathVariable Long id){
         appointmentServiceImpl.deleteById(id);
         log.info("Delete appointment by ID successfully");
@@ -77,6 +83,7 @@ public class AppointmentController {
 
     @Operation(summary = "Updating appointment by Id")
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<AppointmentResponse> updateAppointmentById(@PathVariable Long id, @RequestPart("data") String requestJson,
                                                                      @RequestPart(value = "file", required = false)
                                                                          MultipartFile file) throws JsonProcessingException {
@@ -88,6 +95,7 @@ public class AppointmentController {
 
     @Operation(summary = "Get all Appointments by Patient Id")
     @GetMapping("/patient/{patientId}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<List<AppointmentResponse>> getByPatientId(@PathVariable Long patientId) {
         return ResponseEntity.ok(
                 appointmentServiceImpl.getByPatientId(
@@ -96,12 +104,19 @@ public class AppointmentController {
         );
     }
     @PatchMapping("/{id}/verify")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> verifyAppointment( @PathVariable Long id) {
         appointmentServiceImpl.verifyAppointment(id);
-        return ResponseEntity.ok("Appointment verified successfully");
-    }
+        return ResponseEntity.ok("Appointment verified successfully");}
+
     @GetMapping("/stats")
+    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<AppointmentStatsResponse>
-    getStats() {return ResponseEntity.ok(appointmentServiceImpl.getStats());
+    getStats() {return ResponseEntity.ok(appointmentServiceImpl.getStats());}
+
+    @GetMapping("/insights/monthly")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<MonthlyInsightResponse> getMonthlyInsights() {
+        return ResponseEntity.ok(appointmentServiceImpl.getMonthlyInsights());
     }
 }

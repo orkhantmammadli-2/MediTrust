@@ -4,10 +4,13 @@ import com.ltc.appointmentservice.configuration.MultipartInputStreamFileResource
 import com.ltc.appointmentservice.dto.*;
 import com.ltc.appointmentservice.entity.Appointment;
 import com.ltc.appointmentservice.exception.AppointmentNotFound;
+import com.ltc.appointmentservice.feign.AiClient;
 import com.ltc.appointmentservice.feign.PatientClient;
 import com.ltc.appointmentservice.mapper.AppointmentMapper;
 import com.ltc.appointmentservice.repository.AppointmentRepository;
 import com.ltc.sharedevents.dto.AppointmentVerifiedEvent;
+import com.ltc.sharedevents.dto.InsightRequest;
+import com.ltc.sharedevents.dto.InsightResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ltc.sharedevents.dto.AppointmentCreatedEvent;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -35,14 +39,16 @@ public class AppointmentServiceImpl implements AppointmentService{
     private final AppointmentRepository appointmentRepository;
     private final AppointmentMapper appointmentMapper;
     private final PatientClient patientClient;
+    private final AiClient aiClient;
     private final RestTemplate restTemplate;
     private final SimpMessagingTemplate messagingTemplate;
     private final KafkaProducerService kafkaProducerService;
     private final static String APPOINT_CACHE_NAME = "appointCache";
-    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper, PatientClient patientClient, RestTemplate restTemplate, SimpMessagingTemplate messagingTemplate, KafkaProducerService kafkaProducerService) {
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper, PatientClient patientClient, AiClient aiClient, RestTemplate restTemplate, SimpMessagingTemplate messagingTemplate, KafkaProducerService kafkaProducerService) {
         this.appointmentRepository = appointmentRepository;
         this.appointmentMapper = appointmentMapper;
         this.patientClient = patientClient;
+        this.aiClient = aiClient;
         this.restTemplate = restTemplate;
         this.messagingTemplate = messagingTemplate;
         this.kafkaProducerService = kafkaProducerService;
@@ -185,6 +191,40 @@ public class AppointmentServiceImpl implements AppointmentService{
                 total,
                 verified,
                 pending
+        );
+    }
+    public MonthlyInsightResponse
+    getMonthlyInsights() {LocalDate now = LocalDate.now();
+        int year = now.getYear();
+        int month = now.getMonthValue();
+        List<Object[]> complaints = appointmentRepository.findTopComplaintType();
+        System.out.println("COMPLAINTS = " + complaints);
+        List<Object[]> hospitals = appointmentRepository.findTopHospital();
+
+        System.out.println("HOSPITALS = " + hospitals);
+        Object[] complaint = complaints.get(0);
+        Object[] hospital = hospitals.get(0);
+        Long complaintCount =
+                ((Number) complaint[1])
+                        .longValue();
+
+        Long hospitalCount =
+                ((Number) hospital[1])
+                        .longValue();
+        InsightRequest request =
+                new InsightRequest(
+                        complaint[0].toString(),
+                        complaintCount,
+                        hospital[0].toString(),
+                        hospitalCount
+                );
+        InsightResponse aiResponse = aiClient.generateInsight(request);
+        return new MonthlyInsightResponse(
+                complaint[0].toString(),
+                complaintCount,
+                hospital[0].toString(),
+                hospitalCount,
+                aiResponse.summary()
         );
     }
 }

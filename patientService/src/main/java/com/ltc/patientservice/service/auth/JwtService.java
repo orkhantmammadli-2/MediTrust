@@ -1,10 +1,10 @@
 package com.ltc.patientservice.service.auth;
 
 
+import com.ltc.patientservice.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,9 +37,10 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-
-        return generateToken(new HashMap<>(), userDetails);
-    }
+        Map<String, Object> claims = new HashMap<>();
+        if (userDetails instanceof User user) {
+            claims.put("role", user.getRole().name());}
+        return generateToken(claims, userDetails);}
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return buildToken(extraClaims, userDetails, accessExpiration);
