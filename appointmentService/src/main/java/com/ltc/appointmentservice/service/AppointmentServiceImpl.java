@@ -193,26 +193,16 @@ public class AppointmentServiceImpl implements AppointmentService{
                 pending
         );
     }
-    public MonthlyInsightResponse
-    getMonthlyInsights() {LocalDate now = LocalDate.now();
+    public MonthlyInsightResponse getMonthlyInsights() {LocalDate now = LocalDate.now();
         int year = now.getYear();
         int month = now.getMonthValue();
         List<Object[]> complaints = appointmentRepository.findTopComplaintType();
-        System.out.println("COMPLAINTS = " + complaints);
         List<Object[]> hospitals = appointmentRepository.findTopHospital();
-
-        System.out.println("HOSPITALS = " + hospitals);
         Object[] complaint = complaints.get(0);
         Object[] hospital = hospitals.get(0);
-        Long complaintCount =
-                ((Number) complaint[1])
-                        .longValue();
-
-        Long hospitalCount =
-                ((Number) hospital[1])
-                        .longValue();
-        InsightRequest request =
-                new InsightRequest(
+        Long complaintCount = ((Number) complaint[1]).longValue();
+        Long hospitalCount = ((Number) hospital[1]).longValue();
+        InsightRequest request = new InsightRequest(
                         complaint[0].toString(),
                         complaintCount,
                         hospital[0].toString(),
