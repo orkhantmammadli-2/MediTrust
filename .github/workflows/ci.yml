@@ -6,11 +6,6 @@ on:
       - main
       - master
 
-  pull_request:
-    branches:
-      - main
-      - master
-
 jobs:
   build:
 
@@ -26,6 +21,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+
+      - name: Grant execute permission
+        run: chmod +x gradlew
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
