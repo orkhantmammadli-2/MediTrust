@@ -1,0 +1,8 @@
+server:
+  port: 8085
+spring:
+  application:
+    name: aiService
+gemini:
+  api-key: ${GEMINI_API_KEY}
+
