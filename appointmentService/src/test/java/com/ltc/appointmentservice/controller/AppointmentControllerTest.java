@@ -30,7 +30,7 @@ class AppointmentControllerTest {
 
         MonthlyInsightResponse response =
                 new MonthlyInsightResponse(
-                        "Burun",
+                        "Bel",
                         3L,
                         "LOR Hospital",
                         4L,
