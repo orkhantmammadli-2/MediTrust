@@ -58,8 +58,8 @@ class AppointmentServiceImplTest {
         when(aiClient.generateInsight(any(InsightRequest.class)))
                 .thenReturn(new InsightResponse("AI summary"));
         MonthlyInsightResponse result = appointmentService.getMonthlyInsights();
-        assertEquals("Burun", result.topComplaintType());
 
+        assertEquals("Burun", result.topComplaintType());
         assertEquals(3L, result.topComplaintCount());
         assertEquals("LOR Hospital", result.topHospital());
         assertEquals(4L, result.topHospitalVisitCount());
