@@ -53,55 +53,21 @@ class AppointmentServiceImplTest {
         List<Object[]> hospitals = new ArrayList<>();
         hospitals.add(hospital);
 
-        when(appointmentRepository.findTopComplaintType())
-                .thenReturn(complaints);
-        when(appointmentRepository.findTopHospital())
-                .thenReturn(hospitals);
+        when(appointmentRepository.findTopComplaintType()).thenReturn(complaints);
+        when(appointmentRepository.findTopHospital()).thenReturn(hospitals);
+        when(aiClient.generateInsight(any(InsightRequest.class)))
+                .thenReturn(new InsightResponse("AI summary"));
+        MonthlyInsightResponse result = appointmentService.getMonthlyInsights();
+        assertEquals("Burun", result.topComplaintType());
 
-        when(
-                aiClient.generateInsight(
-                        any(InsightRequest.class)
-                )
-        ).thenReturn(
-                new InsightResponse(
-                        "AI summary"
-                )
-        );
+        assertEquals(3L, result.topComplaintCount());
+        assertEquals("LOR Hospital", result.topHospital());
+        assertEquals(4L, result.topHospitalVisitCount());
+        assertEquals("AI summary", result.aiSummary());
 
-        MonthlyInsightResponse result =
-                appointmentService.getMonthlyInsights();
+        verify(appointmentRepository).findTopComplaintType();
+        verify(appointmentRepository).findTopHospital();
+        verify(aiClient).generateInsight(any(InsightRequest.class));
 
-        assertEquals(
-                "Burun",
-                result.topComplaintType()
-        );
-
-        assertEquals(
-                3L,
-                result.topComplaintCount()
-        );
-
-        assertEquals(
-                "LOR Hospital",
-                result.topHospital()
-        );
-
-        assertEquals(
-                4L,
-                result.topHospitalVisitCount()
-        );
-
-        assertEquals(
-                "AI summary",
-                result.aiSummary()
-        );
-        verify(appointmentRepository)
-                .findTopComplaintType();
-
-        verify(appointmentRepository)
-                .findTopHospital();
-
-        verify(aiClient)
-                .generateInsight(any(InsightRequest.class));
     }
 }

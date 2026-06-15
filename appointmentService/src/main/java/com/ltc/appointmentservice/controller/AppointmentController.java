@@ -48,7 +48,6 @@ public class AppointmentController {
 
     @Operation(summary = "Show all appointments")
     @GetMapping("/all")
-    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<Page<AppointmentResponse>> allAppointments(@ParameterObject @PageableDefault(page = 0, size = 5, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
     Page<AppointmentResponse> appointmentResponse = appointmentServiceImpl.getAll(pageable);
     log.info("All appointments successfully");
@@ -65,7 +64,6 @@ public class AppointmentController {
 
     @Operation(summary = "Get appointment by ID")
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<AppointmentResponse> getAppointmentById(@PathVariable Long id){
         AppointmentResponse appointmentResponse = appointmentServiceImpl.getById(id);
         log.info("Get appointment by ID successfully");
