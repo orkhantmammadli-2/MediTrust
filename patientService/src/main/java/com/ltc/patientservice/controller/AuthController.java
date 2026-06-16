@@ -6,11 +6,13 @@ import com.ltc.patientservice.entity.Role;
 import com.ltc.patientservice.entity.User;
 import com.ltc.patientservice.exception.TokenRefreshException;
 import com.ltc.patientservice.repository.UserRepository;
+import com.ltc.patientservice.service.KafkaProducerService;
 import com.ltc.patientservice.service.auth.JwtService;
 import com.ltc.patientservice.service.auth.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -31,25 +34,44 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+    private final KafkaProducerService kafkaProducerService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(
+            @Valid @RequestBody RegisterRequest request
+    ) {
+
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Email is already in use!");
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Error: Email is already in use!");
         }
 
         var user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER )
+                .role(Role.USER)
                 .build();
+
         userRepository.save(user);
 
-        var accessToken = jwtService.generateToken(user);
-        var refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
+        log.info("Sending user registration event for {}", user.getEmail());
 
-        return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken.getToken()));
+        kafkaProducerService.sendUserRegisteredEvent(
+                user.getEmail(),
+                user.getName()
+        );
+
+        var accessToken = jwtService.generateToken(user);
+        var refreshToken =
+                refreshTokenService.createRefreshToken(user.getEmail());
+
+        return ResponseEntity.ok(
+                new AuthResponse(
+                        accessToken,
+                        refreshToken.getToken()
+                )
+        );
     }
 
     @PostMapping("/login")

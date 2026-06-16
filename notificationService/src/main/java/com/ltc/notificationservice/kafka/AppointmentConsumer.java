@@ -6,6 +6,7 @@ import com.ltc.notificationservice.webhook.TelegramService;
 import com.ltc.notificationservice.webhook.WebhookService;
 import com.ltc.sharedevents.dto.AppointmentCreatedEvent;
 import com.ltc.sharedevents.dto.AppointmentVerifiedEvent;
+import com.ltc.sharedevents.dto.UserRegisteredEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.protocol.types.Field;
 import org.slf4j.Logger;
@@ -54,7 +55,7 @@ public class AppointmentConsumer {
         emailService.sendHtmlEmail("orkhantmammadli@outlook.com",
                 "Verified Appointment",html);
         log.info(
-                "Appointment verified event received: {}",
+                "Consumer received appointment verified event: {}",
                 appointmentVerifiedEvent
         );
     }
@@ -70,6 +71,40 @@ public class AppointmentConsumer {
         telegramService.sendDlqAlert(appointmentCreatedEvent);
         webhookService.sendDlqAlert(appointmentCreatedEvent);
     }
+    @KafkaListener(
+            topics = "user-registration-topic",
+            groupId = "notification-group"
+    )
+    public void handleUserRegistration(
+            UserRegisteredEvent event
+    ) {
 
+        log.info(
+                "Consumer received User registration event : {}",
+                event
+        );
 
-}
+        String html = """
+        <html>
+        <body>
+            <h2>Welcome to MediTrust AI</h2>
+            <p>Dear %s,</p>
+            <p>Your account has been created successfully.</p>
+        </body>
+        </html>
+        """
+                .formatted(event.name());
+
+        emailService.sendHtmlEmail(
+                "orkhantmammadli@outlook.com",
+                "Welcome to MediTrust AI",
+                html
+        );
+
+        log.info(
+                "Welcome email sent to {}",
+                event.email()
+        );
+    }
+    }
+

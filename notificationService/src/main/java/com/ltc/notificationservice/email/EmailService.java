@@ -2,6 +2,7 @@ package com.ltc.notificationservice.email;
 
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailService {
 
     private final JavaMailSender mailSender;
@@ -21,9 +23,11 @@ public class EmailService {
             helper.setSubject(subject);
             helper.setText(htmlContent, true); // true for HTML content
 
-            mailSender.send(mimeMessage);
-        } catch (MailException e) {
-        } catch (jakarta.mail.MessagingException e) {
+            mailSender.send(mimeMessage);}
+          catch (MailException e) {}
+          catch (jakarta.mail.MessagingException e) {}
+          catch (Exception e) {
+            log.error("Email sending failed", e);
         }
     }
 }
