@@ -1,7 +1,4 @@
-version: '3.9'
-
 services:
-
   postgres:
     image: postgres:17
     container_name: postgres
@@ -13,12 +10,20 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7
     container_name: redis
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
 
   kafka:
     image: apache/kafka:latest
@@ -60,6 +65,7 @@ services:
     container_name: patient_service
     depends_on:
       - postgres
+      - kafka
     ports:
       - "8081:8081"
     environment:
@@ -140,3 +146,4 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:

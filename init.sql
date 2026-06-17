@@ -1,0 +1,2 @@
+DROP DATABASE patient_db;
+CREATE DATABASE patient_DB;
