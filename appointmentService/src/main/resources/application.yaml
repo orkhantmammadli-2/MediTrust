@@ -8,12 +8,14 @@ spring:
   data:
     redis:
       host: localhost
+#      host: redis
       port: 6379
       timeout: 5000
     cache:
       type: redis
   datasource:
     url: jdbc:postgresql://localhost:5432/appointment_DB
+#    url: jdbc:postgresql://postgres:5432/appointment_DB
     username: postgres
     password: 12345678
     driver-class-name: org.postgresql.Driver
@@ -26,6 +28,7 @@ spring:
         format_sql: true
   kafka:
     bootstrap-servers: localhost:9092
+#    bootstrap-servers: kafka:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer

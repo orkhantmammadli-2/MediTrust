@@ -1,7 +1,6 @@
 rootProject.name = 'MediTrust'
-
+include 'shared-events'
 include 'patientService'
 include 'appointmentService'
 include 'fileService'
 include 'notificationService'
-include 'shared-events'
