@@ -1,11 +1,11 @@
 package com.ltc.appointmentservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ltc.appointmentservice.configuration.HmacUtil;
 import com.ltc.sharedevents.dto.AppointmentCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
-import com.ltc.sharedevents.webhook.HmacUtil;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

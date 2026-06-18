@@ -8,9 +8,8 @@ import com.ltc.appointmentservice.feign.AiClient;
 import com.ltc.appointmentservice.feign.PatientClient;
 import com.ltc.appointmentservice.mapper.AppointmentMapper;
 import com.ltc.appointmentservice.repository.AppointmentRepository;
+import com.ltc.sharedevents.dto.AppointmentCreatedEvent;
 import com.ltc.sharedevents.dto.AppointmentVerifiedEvent;
-import com.ltc.sharedevents.dto.InsightRequest;
-import com.ltc.sharedevents.dto.InsightResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,7 +25,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import com.ltc.sharedevents.dto.AppointmentCreatedEvent;
 
 import java.io.IOException;
 import java.time.LocalDate;

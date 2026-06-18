@@ -21,7 +21,6 @@ public class FileController {
     private final FileServiceImpl fileServiceImpl;
 
     @PostMapping(value = "/upload", consumes = MULTIPART_FORM_DATA)
-    @PreAuthorize("hasAnyAuthority('ADMIN','USER')")
     public ResponseEntity<FileUploadResponse> upload (@RequestParam("file")
             MultipartFile file) {return ResponseEntity.ok(fileServiceImpl.upload(file)
         );

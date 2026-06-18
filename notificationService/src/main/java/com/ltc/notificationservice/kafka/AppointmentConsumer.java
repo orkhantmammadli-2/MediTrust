@@ -6,13 +6,10 @@ import com.ltc.notificationservice.webhook.TelegramService;
 import com.ltc.notificationservice.webhook.WebhookService;
 import com.ltc.sharedevents.dto.AppointmentCreatedEvent;
 import com.ltc.sharedevents.dto.AppointmentVerifiedEvent;
-import com.ltc.sharedevents.dto.UserRegisteredEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.protocol.types.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -22,6 +19,7 @@ public class AppointmentConsumer {
     private final EmailTemplateService emailTemplateService;
     private final WebhookService webhookService;
     private final TelegramService telegramService;
+
     public AppointmentConsumer(EmailService emailService, EmailTemplateService emailTemplateService, WebhookService webhookService, TelegramService telegramService) {
         this.emailService = emailService;
         this.emailTemplateService = emailTemplateService;
@@ -29,82 +27,66 @@ public class AppointmentConsumer {
         this.telegramService = telegramService;
     }
 
-
     @KafkaListener(
-            topics = "appointment-created",
+            topics = "appointment-created-v2",
             groupId = "notification-group"
     )
     public void consume(
-            AppointmentCreatedEvent appointmentCreatedEvent)
-    {   if (appointmentCreatedEvent.appointmentId() == 20) {throw new RuntimeException();}
+            AppointmentCreatedEvent appointmentCreatedEvent) {
+        if (appointmentCreatedEvent.appointmentId() == 35) {
+            throw new RuntimeException();
+        }
         String html = emailTemplateService.buildAppointmentCreated(appointmentCreatedEvent);
         emailService.sendHtmlEmail(
-            "orkhantmammadli@outlook.com",
-            "New Appointment",
-            html);
+                "orkhantmammadli@outlook.com",
+                "New Appointment",
+                html);
         log.info("Consumer received appointment created event: {}",
                 appointmentCreatedEvent);
     }
+
     @KafkaListener(
-            topics = "appointment-verified",
+            topics = "appointment-verified-v2",
             groupId = "notification-group"
     )
     public void consumeVerified(
             AppointmentVerifiedEvent appointmentVerifiedEvent) {
         String html = emailTemplateService.buildAppointmentVerified(appointmentVerifiedEvent);
         emailService.sendHtmlEmail("orkhantmammadli@outlook.com",
-                "Verified Appointment",html);
+                "Verified Appointment", html);
         log.info(
                 "Consumer received appointment verified event: {}",
                 appointmentVerifiedEvent
         );
     }
+
     private static final Logger dlqLogger =
             LoggerFactory.getLogger("DLQ_LOGGER");
+
     @KafkaListener(
-            topics = "appointment-created-dlt",
+            topics = "appointment-created-v2-dlt",
             groupId = "notification-group")
     public void consumeDlt(
-            AppointmentCreatedEvent appointmentCreatedEvent) {
-        dlqLogger.error( "DLQ EVENT RECEIVED: {}",
-                appointmentCreatedEvent);
-        telegramService.sendDlqAlert(appointmentCreatedEvent);
-        webhookService.sendDlqAlert(appointmentCreatedEvent);
-    }
-    @KafkaListener(
-            topics = "user-registration-topic",
-            groupId = "notification-group"
-    )
-    public void handleUserRegistration(
-            UserRegisteredEvent event
-    ) {
+            AppointmentCreatedEvent event) {
 
-        log.info(
-                "Consumer received User registration event : {}",
-                event
-        );
+        dlqLogger.error(
+                "DLQ EVENT RECEIVED: {}",
+                event);
 
-        String html = """
-        <html>
-        <body>
-            <h2>Welcome to MediTrust AI</h2>
-            <p>Dear %s,</p>
-            <p>Your account has been created successfully.</p>
-        </body>
-        </html>
-        """
-                .formatted(event.name());
+        try {
+            telegramService.sendDlqAlert(event);
+            System.out.println("TELEGRAM OK");
+        } catch (Exception e) {
+            log.error("Telegram error", e);
+        }
 
-        emailService.sendHtmlEmail(
-                "orkhantmammadli@outlook.com",
-                "Welcome to MediTrust AI",
-                html
-        );
-
-        log.info(
-                "Welcome email sent to {}",
-                event.email()
-        );
+        try {
+            webhookService.sendDlqAlert(event);
+            System.out.println("WEBHOOK OK");
+        } catch (Exception e) {
+            log.error("Webhook error", e);
+        }
     }
     }
+
 

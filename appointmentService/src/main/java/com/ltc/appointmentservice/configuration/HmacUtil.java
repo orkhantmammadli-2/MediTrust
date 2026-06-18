@@ -1,4 +1,4 @@
-package com.ltc.sharedevents.webhook;
+package com.ltc.appointmentservice.configuration;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

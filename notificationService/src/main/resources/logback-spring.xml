@@ -1,5 +1,6 @@
 <configuration>
 
+    <!-- Console -->
     <appender name="CONSOLE"
               class="ch.qos.logback.core.ConsoleAppender">
 
@@ -11,6 +12,7 @@
 
     </appender>
 
+    <!-- Main Application Log -->
     <appender name="FILE"
               class="ch.qos.logback.core.FileAppender">
 
@@ -20,6 +22,30 @@
 
     </appender>
 
+    <!-- DLQ Log -->
+    <appender name="DLQ_FILE"
+              class="ch.qos.logback.core.FileAppender">
+
+        <file>logs/dlq-events.log</file>
+
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss} %-5level %msg%n
+            </pattern>
+        </encoder>
+
+    </appender>
+
+    <!-- DLQ Specific Logger -->
+    <logger name="DLQ_LOGGER"
+            level="ERROR"
+            additivity="false">
+
+        <appender-ref ref="DLQ_FILE"/>
+
+    </logger>
+
+    <!-- Root Logger -->
     <root level="INFO">
 
         <appender-ref ref="CONSOLE"/>

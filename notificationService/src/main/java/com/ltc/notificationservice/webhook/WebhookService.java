@@ -1,16 +1,14 @@
 package com.ltc.notificationservice.webhook;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ltc.notificationservice.configuration.HmacUtil;
 import com.ltc.sharedevents.dto.AppointmentCreatedEvent;
-import com.ltc.sharedevents.webhook.HmacUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import static java.security.KeyRep.Type.SECRET;
 
 @Service
 @RequiredArgsConstructor

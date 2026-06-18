@@ -1,12 +1,12 @@
 package com.ltc.appointmentservice.service;
 
+import com.ltc.appointmentservice.dto.InsightRequest;
+import com.ltc.appointmentservice.dto.InsightResponse;
 import com.ltc.appointmentservice.dto.MonthlyInsightResponse;
 import com.ltc.appointmentservice.feign.AiClient;
 import com.ltc.appointmentservice.feign.PatientClient;
 import com.ltc.appointmentservice.mapper.AppointmentMapper;
 import com.ltc.appointmentservice.repository.AppointmentRepository;
-import com.ltc.sharedevents.dto.InsightRequest;
-import com.ltc.sharedevents.dto.InsightResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

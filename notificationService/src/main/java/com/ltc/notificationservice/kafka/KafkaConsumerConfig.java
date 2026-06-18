@@ -59,7 +59,7 @@ public class KafkaConsumerConfig {
     @Bean
     public NewTopic appointmentCreatedDltTopic() {
         return TopicBuilder
-                .name("appointment-created-dlt")
+                .name("appointment-created-v2-dlt")
                 .partitions(1)
                 .replicas(1)
                 .build();}}

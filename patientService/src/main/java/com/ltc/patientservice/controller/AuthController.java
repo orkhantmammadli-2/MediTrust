@@ -6,7 +6,6 @@ import com.ltc.patientservice.entity.Role;
 import com.ltc.patientservice.entity.User;
 import com.ltc.patientservice.exception.TokenRefreshException;
 import com.ltc.patientservice.repository.UserRepository;
-import com.ltc.patientservice.service.KafkaProducerService;
 import com.ltc.patientservice.service.auth.JwtService;
 import com.ltc.patientservice.service.auth.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,7 +33,6 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
-    private final KafkaProducerService kafkaProducerService;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(
@@ -56,11 +54,6 @@ public class AuthController {
         userRepository.save(user);
 
         log.info("Sending user registration event for {}", user.getEmail());
-
-        kafkaProducerService.sendUserRegisteredEvent(
-                user.getEmail(),
-                user.getName()
-        );
 
         var accessToken = jwtService.generateToken(user);
         var refreshToken =
