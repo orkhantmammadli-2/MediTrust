@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Patients</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body onload="loadPatients()">
+
+<div class="container">
+
+    <div class="container">
+
+        <h1>👥 Patient Management</h1>
+
+        <div class="page-actions">
+
+            <button onclick="window.location.href='dashboard.html'">
+                Back to Dashboard
+            </button>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Add New Patient</h2>
+
+            <div class="patient-form">
+
+                <input id="firstName" placeholder="First Name">
+
+                <input id="lastName" placeholder="Last Name">
+
+                <input id="birthDate" type="date">
+
+                <select id="gender">
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                </select>
+
+                <input id="email" placeholder="Email">
+
+                <input id="mobileNumber" placeholder="+994501112233">
+
+            </div>
+
+            <button onclick="addPatient()">
+                Save Patient
+            </button>
+
+        </div>
+
+        <div class="card">
+
+            <h2>All Patients</h2>
+
+            <table class="patients-table">
+
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+
+                <tbody id="patientsTable"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

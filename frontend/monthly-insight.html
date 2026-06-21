@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Monthly Insights</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js"></script>
+</head>
+
+<body>
+
+<div class="container ai-container">
+
+    <div class="ai-header">
+
+        <h1>🤖 AI Monthly Insights</h1>
+
+        <p>
+            Discover trends, patient feedback patterns,
+            top complaints and hospital performance powered by AI.
+        </p>
+
+        <button onclick="loadMonthlyInsight()">
+            ✨ Generate Insight
+        </button>
+
+    </div>
+    <div class="page-actions">
+
+        <button onclick="window.location.href='dashboard.html'">
+            Back to Dashboard
+        </button>
+
+    </div>
+
+    <div class="card ai-insight-card">
+
+        <div class="insight-stat">
+
+            <span class="insight-label">
+                Top Complaint
+            </span>
+
+            <h2 id="topComplaint">
+                —
+            </h2>
+
+        </div>
+
+        <div class="insight-stat">
+
+            <span class="insight-label">
+                Top Hospital
+            </span>
+
+            <h2 id="topHospital">
+                —
+            </h2>
+
+        </div>
+
+        <div class="ai-summary-box">
+
+            <h3>
+                🤖 AI Analysis
+            </h3>
+
+            <p id="aiSummary">
+                Click "Generate Insight" to receive AI-powered analysis.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import java.util.List;
 
 @Controller
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class AppointmentGraphQLController {
 

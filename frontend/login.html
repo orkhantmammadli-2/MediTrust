@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>MediTrust Login</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
+
+    <style>
+        /* Yalnız başlıq ölçüsünü böyüdür və "MediTrust" sözünü ağ rəng etməyəcək */
+        .login-box h2{
+            font-size: 42px; /* istəsəniz 36px və ya başqa dəyər qoya bilərsiniz */
+            color: #0d6efd;  /* ağ olmamalıdır — burada mavi nümunə; başqa rəng istəyirsinizsə deyin */
+            margin: 0 0 18px;
+            font-weight: 1000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-page">
+
+    <div class="welcome-panel">
+
+        <h1>⚕️ MediTrust AI</h1>
+
+        <h2>
+            Smart Healthcare Feedback &
+            Appointment Management Platform
+        </h2>
+
+        <p>
+
+            Manage patients, appointments,
+            AI-powered insights, GraphQL filtering
+            and real-time updates with WebSocket.
+
+        </p>
+
+        <div class="features">
+
+            <div>✅ Patient Management</div>
+
+            <div>✅ Appointment Tracking</div>
+
+            <div>✅ AI Monthly Insights</div>
+
+            <div>✅ Real-Time Notifications</div>
+
+            <div>✅ GraphQL Search</div>
+
+        </div>
+
+    </div>
+
+    <div class="login-box">
+
+        <h2>Login</h2>
+
+        <input
+                type="email"
+                id="email"
+                placeholder="Email">
+
+        <input
+                type="password"
+                id="password"
+                placeholder="Password">
+
+        <button onclick="login()">
+            Login
+        </button>
+
+        <div class="auth-links">
+
+            <span>
+                Don't have an account?
+            </span>
+
+            <a href="register.html">
+                Register
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

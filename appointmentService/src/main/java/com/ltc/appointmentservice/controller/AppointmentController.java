@@ -27,7 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/appointments")
 @Slf4j
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 
 public class AppointmentController {
     private final AppointmentServiceImpl appointmentServiceImpl;

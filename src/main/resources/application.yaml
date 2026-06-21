@@ -18,8 +18,8 @@ spring:
               filters:
                 - name: RequestRateLimiter
                   args:
-                    redis-rate-limiter.replenishRate: 1
-                    redis-rate-limiter.burstCapacity: 1
+                    redis-rate-limiter.replenishRate: 50
+                    redis-rate-limiter.burstCapacity: 50
                     key-resolver: "#{@ipKeyResolver}"
                 - name: CircuitBreaker
                   args:
@@ -32,8 +32,8 @@ spring:
               filters:
                 - name: RequestRateLimiter
                   args:
-                    redis-rate-limiter.replenishRate: 3
-                    redis-rate-limiter.burstCapacity: 3
+                    redis-rate-limiter.replenishRate: 50
+                    redis-rate-limiter.burstCapacity: 50
                     key-resolver: "#{@ipKeyResolver}"
                 - name: CircuitBreaker
                   args:
@@ -46,8 +46,8 @@ spring:
               filters:
                 - name: RequestRateLimiter
                   args:
-                    redis-rate-limiter.replenishRate: 3
-                    redis-rate-limiter.burstCapacity: 3
+                    redis-rate-limiter.replenishRate: 50
+                    redis-rate-limiter.burstCapacity: 50
                     key-resolver: "#{@ipKeyResolver}"
                 - name: CircuitBreaker
                   args:
@@ -61,6 +61,10 @@ spring:
               uri: http://localhost:8085
               predicates:
                 - Path=/api/v1/ai/**
+            - id: graphql
+              uri: http://localhost:8082
+              predicates:
+                - Path=/graphql
 resilience4j:
   circuitbreaker:
     instances:

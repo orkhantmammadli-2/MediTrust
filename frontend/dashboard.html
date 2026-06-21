@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>MediTrust Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+    <script defer src="app.js"></script>
+
+</head>
+
+<body onload="initializeDashboard()">
+
+<div class="navbar">
+
+    <h1>⚕️ MediTrust Dashboard</h1>
+
+    <div class="nav-links">
+
+        <a href="dashboard.html">
+            📊 Dashboard
+        </a>
+
+        <a href="patients.html">
+            👥 Patients
+        </a>
+
+        <a href="appointments.html">
+            📅 Appointments
+        </a>
+
+        <a href="monthly-insight.html">
+            🤖 AI Insights
+        </a>
+
+        <a
+                class="logout-btn"
+                href="#"
+                onclick="logout()">
+            🚪 Logout
+        </a>
+
+    </div>
+
+</div>
+
+<div class="container">
+
+    <h1>Dashboard</h1>
+
+    <div
+            class="connection"
+            id="connection">
+
+        🟢 Connected 😊
+
+    </div>
+
+    <div class="dashboard-top">
+
+        <!-- LEFT -->
+
+        <div class="stats-container">
+
+            <div class="stat-card">
+
+                <h4>Total</h4>
+
+                <p
+                        class="stat"
+                        id="totalAppointments">
+
+                    0
+
+                </p>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h4>Verified</h4>
+
+                <p
+                        class="stat"
+                        id="verifiedAppointments">
+
+                    0
+
+                </p>
+
+            </div>
+
+            <div class="stat-card">
+
+                <h4>Pending</h4>
+
+                <p
+                        class="stat"
+                        id="pendingAppointments">
+
+                    0
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT -->
+
+        <div class="filters-card">
+
+            <input
+                    class="search-box"
+                    type="text"
+                    id="doctorFilter"
+                    placeholder="🥼 Doctor Name">
+
+            <input
+                    class="search-box"
+                    type="text"
+                    id="complaintFilter"
+                    placeholder="😷 Complaint Type">
+
+            <input
+                    class="search-box"
+                    type="text"
+                    id="appointmentPlaceFilter"
+                    placeholder="🏥 Hospital">
+
+            <label class="document-label">
+
+                <input
+                        type="checkbox"
+                        id="documentFilter">
+
+                Doctor Document
+
+            </label>
+
+        </div>
+
+    </div>
+
+    <!-- APPOINTMENTS -->
+
+    <div id="cards"></div>
+
+    <div id="pagination">
+
+        <button id="prevBtn">
+            Previous
+        </button>
+
+        <span id="pageInfo">
+            Page 1
+        </span>
+
+        <button id="nextBtn">
+            Next
+        </button>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
+

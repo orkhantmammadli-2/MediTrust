@@ -33,7 +33,7 @@ public class AppointmentConsumer {
     )
     public void consume(
             AppointmentCreatedEvent appointmentCreatedEvent) {
-        if (appointmentCreatedEvent.appointmentId() == 35) {
+        if (appointmentCreatedEvent.appointmentId() == 15) {
             throw new RuntimeException();
         }
         String html = emailTemplateService.buildAppointmentCreated(appointmentCreatedEvent);

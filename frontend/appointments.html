@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments - MediTrust</title>
+
+
+    <link rel="stylesheet" href="style.css">
+    <script defer src="app.js"></script>
+
+
+</head>
+
+<body onload="loadAppointments();loadStats();">
+
+<div class="container">
+
+    <div class="page-header">
+
+        <h1>🏥 Appointment Management</h1>
+
+        <p>
+            Create and manage patient appointments,
+            feedback and hospital reviews.
+        </p>
+
+        <button onclick="window.location.href='dashboard.html'">
+            🔙 Back to Dashboard
+        </button>
+
+    </div>
+
+    <div class="card appointment-card-premium">
+
+        <h2>
+            ➕ Create Appointment
+        </h2>
+
+        <div class="appointment-form-grid">
+
+            <input
+                    id="patientId"
+                    placeholder="Patient ID">
+
+            <input
+                    id="appointmentDate"
+                    type="datetime-local">
+
+            <input
+                    id="appointmentPlace"
+                    placeholder="Hospital">
+
+            <input
+                    id="doctorName"
+                    placeholder="Doctor Name">
+
+            <input
+                    id="complaintType"
+                    placeholder="Complaint Type">
+
+            <select id="rating">
+
+                <option value="VERY_GOOD">
+                    VERY_GOOD
+                </option>
+
+                <option value="THE_BEST">
+                    THE_BEST
+                </option>
+
+            </select>
+
+        </div>
+
+        <textarea
+                id="feedback"
+                placeholder="Patient Feedback">
+        </textarea>
+
+        <div class="appointment-form-grid">
+
+            <input
+                    id="likedAspect1"
+                    placeholder="Liked Aspect 1">
+
+            <input
+                    id="likedAspect2"
+                    placeholder="Liked Aspect 2">
+
+        </div>
+
+        <div class="upload-area">
+
+            <label>
+                📄 Upload Admission Document
+            </label>
+
+            <input
+                    type="file"
+                    id="file">
+
+        </div>
+
+        <button
+                class="create-btn"
+                onclick="createAppointment()">
+
+            🚀 Create Appointment
+
+        </button>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
