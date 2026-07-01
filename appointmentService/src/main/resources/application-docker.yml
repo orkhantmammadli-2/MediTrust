@@ -1,12 +1,12 @@
 patient:
   service:
-    url: http://patient_service:8081
+    url: http://patient-service:8081
 ai:
   service:
-    url: http://ai_service:8085
+    url: http://ai-service:8085
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/appointment_DB
+    url: jdbc:postgresql://postgres:5432/appointment_data
     username: postgres
     password: 12345678
 

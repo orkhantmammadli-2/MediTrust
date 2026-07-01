@@ -13,7 +13,7 @@ spring:
     cache:
       type: redis
   datasource:
-    url: jdbc:postgresql://localhost:5432/appointment_DB
+    url: jdbc:postgresql://localhost:5432/appointment_data
     username: postgres
     password: 12345678
     driver-class-name: org.postgresql.Driver

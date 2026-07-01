@@ -1,4 +1,2 @@
--- DROP DATABASE IF EXISTS patient_db;
---
--- CREATE DATABASE patient_db;
+CREATE DATABASE appointment_data;
 
