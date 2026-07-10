@@ -8,16 +8,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
         name = "ai-service",
-//        url = "${ai.service.url}"
-        url = "http://localhost:8085"
+//        url = "http://localhost:8085",
+        url = "http://ai-service:8085"
 )
 public interface AiClient {
 
-    @PostMapping(
-            "/api/v1/ai/monthly-insight"
-    )
+    @PostMapping("/api/v1/ai/monthly-insight")
     InsightResponse generateInsight(
-            @RequestBody
-            InsightRequest request
+            @RequestBody InsightRequest request
     );
 }

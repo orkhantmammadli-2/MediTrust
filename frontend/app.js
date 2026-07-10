@@ -691,38 +691,38 @@ if (file) {
     );
 }
 
-const response =
-    await fetch(
-        API_URL +
-        "/api/v1/appointments/add",
-        {
-            method: "POST",
+    const response =
+        await fetch(
+            API_URL +
+            "/api/v1/appointments/add",
+            {
+                method: "POST",
 
-            headers: {
-                Authorization:
-                    "Bearer " +
-                    getToken()
-            },
+                headers: {
+                    Authorization:
+                        "Bearer " + getToken()
+                },
 
-            body: formData
-        }
-    );
+                body: formData
+            }
+        );
 
-if (response.ok) {
+    console.log("Status:", response.status);
 
-    alert(
-        "Appointment Created"
-    );
+    const responseBody = await response.text();
+    console.log("Response:", responseBody);
 
-    loadAppointments();
-    loadStats();
+    if (response.ok) {
 
-} else {
+        alert("Appointment Created");
 
-    alert(
-        "Create Failed"
-    );
-}
+        loadAppointments();
+        loadStats();
+
+    } else {
+
+        alert("Create Failed");
+    }
 
 }
 
@@ -767,34 +767,44 @@ function formatDate(dateStr){
 }
 let currentPage = 0;
 let totalPages = 0;
+
 async function loadAppointments(){
 
-    const response =
-        await fetch(
-            API_URL +
-            `/api/v1/appointments/verified?page=${currentPage}&size=5`,
-            {
-                headers:{
-                    Authorization:
-                        "Bearer " + getToken()
-                }
+    const response = await fetch(
+        API_URL + `/api/v1/appointments/verified?page=${currentPage}&size=5`,
+        {
+            headers: {
+                Authorization: "Bearer " + getToken()
             }
-        );
+        }
+    );
 
-    const result =
-        await response.json();
+    if (!response.ok) {
+        console.error("Server xətası:", response.status);
+        if (response.status === 401 || response.status === 403) {
+            // token problemi - məsələn login səhifəsinə yönləndir
+            console.warn("Token etibarsızdır və ya yoxdur");
+        }
+        return;
+    }
 
-    totalPages =
-        result.totalPages;
+    const text = await response.text();
+    if (!text) {
+        console.warn("Server boş cavab qaytardı");
+        totalPages = 0;
+        document.getElementById("pageInfo").innerText = "Page 0 / 0";
+        renderAppointments([]);
+        return;
+    }
 
-    document.getElementById(
-        "pageInfo"
-    ).innerText =
+    const result = JSON.parse(text);
+
+    totalPages = result.totalPages;
+
+    document.getElementById("pageInfo").innerText =
         `Page ${result.number + 1} / ${result.totalPages}`;
 
-    renderAppointments(
-        result.content
-    );
+    renderAppointments(result.content);
 }
 function renderAppointments(data){
 
@@ -864,49 +874,30 @@ function renderAppointments(data){
         `;
     });
 }
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+document.addEventListener("DOMContentLoaded", () => {
 
+    if (document.getElementById("cards")) {
         loadStats();
-
         loadAppointments();
-
-        document
-            .getElementById("prevBtn")
-            ?.addEventListener(
-                "click",
-                () => {
-
-                    if(currentPage > 0){
-
-                        currentPage--;
-
-                        loadAppointments();
-                    }
-                }
-            );
-
-        document
-            .getElementById("nextBtn")
-            ?.addEventListener(
-                "click",
-                () => {
-
-                    if(
-                        currentPage <
-                        totalPages - 1
-                    ){
-
-                        currentPage++;
-
-                        loadAppointments();
-                    }
-                }
-            );
-
     }
-);
+
+    document.getElementById("prevBtn")
+        ?.addEventListener("click", () => {
+            if (currentPage > 0) {
+                currentPage--;
+                loadAppointments();
+            }
+        });
+
+    document.getElementById("nextBtn")
+        ?.addEventListener("click", () => {
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                loadAppointments();
+            }
+        });
+
+});
 async function filterAppointments(){
     console.log("FILTER TRIGGERED");
 
@@ -1032,19 +1023,7 @@ async function register() {
         alert("Registration failed");
     }
 }
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
 
-        if(document.getElementById("cards")){
-
-            loadStats();
-            loadAppointments();
-
-        }
-
-    }
-);
 /* WEBSOCKET */
 
 if (typeof SockJS !== "undefined") {
