@@ -28,7 +28,7 @@ class AppointmentRepositoryTest {
         a1.setAppointmentDate(LocalDateTime.now());
         a1.setAppointmentPlace("LOR Hospital");
         a1.setDoctorName("Dr. House");
-        a1.setComplaintType("Burun");
+        a1.setComplaintType("Bel");
         a1.setFeedback("Excellent doctor");
         a1.setLikedAspect1("Politeness");
         a1.setLikedAspect2("Experience");
@@ -61,7 +61,7 @@ class AppointmentRepositoryTest {
 
         List<Object[]> result = appointmentRepository.findTopComplaintType();
         assertFalse(result.isEmpty());
-        assertEquals("Burun", result.get(0)[0]);
+        assertEquals("Bel", result.get(0)[0]);
         assertEquals(2L, result.get(0)[1]);
 
     }
