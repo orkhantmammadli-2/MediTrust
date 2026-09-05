@@ -19,7 +19,7 @@ class AppointmentSecurityIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    void shouldReturn401WithoutToken() throws Exception {
+    void shouldReturn403WithoutToken() throws Exception {
 
         mockMvc.perform(get("/api/v1/appointments/1"))
                 .andDo(print())
