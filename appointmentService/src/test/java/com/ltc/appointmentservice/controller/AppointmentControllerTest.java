@@ -51,9 +51,6 @@ class AppointmentControllerTest {
         response.setFeedback("Doctor was very professional and helpful.");
         response.setLikedAspect1("Politeness");
         response.setLikedAspect2("Experience");
-        response.setAdmissionDocumentPath(
-                "https://medi-trust-ai-files-697374140390-eu-north-1-an.s3.eu-north-1.amazonaws.com/e6b5d1b8-3efc-4b13-9d2b-c3b00d14c21b-grey-geometrical-shapes-background.jpg"
-        );
         response.setAdmissionVerified(true);
 
         when(appointmentServiceImpl.getById(1L))
